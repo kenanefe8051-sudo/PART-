@@ -1,0 +1,2805 @@
+<!DOCTYPE html>
+<meta name="robots" content="noindex">
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Parti Oyunları 🎉</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{touch-action:manipulation;height:100%;}
+body{font-family:'Nunito',sans-serif;background:#0e0b1a;color:#fff;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 20%,rgba(255,107,107,.15) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(77,150,255,.15) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,rgba(199,125,255,.08) 0%,transparent 60%);}
+.screen{display:none;width:100%;max-width:420px;min-height:100vh;
+  padding:28px 20px;flex-direction:column;align-items:center;
+  justify-content:center;position:relative;z-index:1;gap:16px;}
+.screen.active{display:flex;}
+
+/* SPLASH */
+#screen-splash{text-align:center;}
+.splash-emoji{font-size:72px;animation:bounce 2s infinite;display:block;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.splash-title{font-family:'Bebas Neue',cursive;font-size:52px;line-height:1;
+  background:linear-gradient(135deg,#ff6b6b,#ffd93d,#c77dff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 20px rgba(255,107,107,.4));}
+.splash-sub{font-size:15px;color:rgba(255,255,255,.45);margin-top:-4px;margin-bottom:12px;}
+
+/* PICKER */
+#screen-pick{gap:16px;}
+.pick-title{font-family:'Bebas Neue',cursive;font-size:34px;letter-spacing:1px;text-align:center;}
+.game-cards{display:flex;flex-direction:column;gap:12px;width:100%;}
+.game-card{width:100%;border:none;border-radius:20px;padding:20px 22px;
+  display:flex;align-items:center;gap:16px;text-align:left;
+  -webkit-appearance:none;user-select:none;touch-action:manipulation;cursor:pointer;}
+.game-card:active{opacity:.82;}
+.gc-mlto{background:linear-gradient(135deg,#ff6b6b,#ff4757);box-shadow:0 10px 28px rgba(255,71,87,.4);}
+.gc-bottle{background:linear-gradient(135deg,#f5a623,#e8850a);box-shadow:0 10px 28px rgba(245,166,35,.4);}
+.gc-tabu{background:linear-gradient(135deg,#a855f7,#7c3aed);box-shadow:0 10px 28px rgba(168,85,247,.4);}
+.gc-icon{font-size:40px;flex-shrink:0;}
+.gc-name{font-family:'Bebas Neue',cursive;font-size:24px;color:#fff;letter-spacing:.5px;}
+.gc-desc{font-size:12px;color:rgba(255,255,255,.7);margin-top:2px;font-weight:600;}
+
+/* BUTTONS */
+.btn{width:100%;padding:16px;border:none;border-radius:14px;
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
+  -webkit-appearance:none;user-select:none;touch-action:manipulation;cursor:pointer;
+  transition:opacity .15s;}
+.btn:active{opacity:.78;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-red{background:linear-gradient(135deg,#ff6b6b,#ff4757);color:#fff;box-shadow:0 8px 22px rgba(255,71,87,.35);}
+.btn-amber{background:linear-gradient(135deg,#f5a623,#e8850a);color:#fff;box-shadow:0 8px 22px rgba(245,166,35,.4);}
+.btn-purple{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;box-shadow:0 8px 22px rgba(168,85,247,.4);}
+.btn-green{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 8px 22px rgba(34,197,94,.4);}
+.btn-orange{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;box-shadow:0 8px 22px rgba(249,115,22,.4);}
+.btn-secondary{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1.5px solid rgba(255,255,255,.1);}
+.btn-ghost{background:transparent;color:rgba(255,255,255,.35);font-size:14px;padding:10px;}
+.btn-small{width:auto;padding:10px 18px;font-size:14px;border-radius:12px;}
+
+/* SETUP */
+#screen-setup{justify-content:flex-start;padding-top:48px;}
+.section-title{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:1px;align-self:flex-start;}
+.players-list{width:100%;display:flex;flex-direction:column;gap:9px;max-height:190px;overflow-y:auto;}
+.player-tag{display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.1);border-radius:12px;padding:11px 15px;animation:slideIn .2s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+.player-dot{width:10px;height:10px;border-radius:50%;margin-right:10px;flex-shrink:0;}
+.player-left{display:flex;align-items:center;}
+.player-name{font-weight:700;font-size:15px;}
+.remove-btn{background:none;border:none;color:rgba(255,255,255,.25);font-size:17px;padding:6px 8px;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;}
+.input-row{display:flex;gap:10px;width:100%;}
+input[type=text]{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:12px;padding:13px 15px;color:#fff;font-family:'Nunito',sans-serif;
+  font-size:15px;outline:none;transition:border-color .2s;}
+input[type=text]:focus{border-color:rgba(255,107,107,.55);}
+input[type=text]::placeholder{color:rgba(255,255,255,.22);}
+.add-btn{background:linear-gradient(135deg,#ff6b6b,#ff4757);border:none;border-radius:12px;
+  width:50px;height:50px;font-size:22px;color:#fff;cursor:pointer;flex-shrink:0;
+  touch-action:manipulation;-webkit-appearance:none;}
+.mode-tabs{display:flex;gap:6px;width:100%;background:rgba(255,255,255,.08);border-radius:14px;padding:5px;}
+.mode-tab{flex:1;padding:10px 5px;border:none;border-radius:10px;
+  font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;
+  background:transparent;color:rgba(255,255,255,.38);
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none; text-align:center;}
+.mode-tab.active{background:#fff;color:#0e0b1a;}
+.hint{font-size:12px;color:rgba(255,255,255,.28);text-align:center;}
+#mltOptions{width:100%;display:flex;flex-direction:column;gap:10px;}
+
+/* CARD GAME (MLT) */
+#screen-game{gap:0;justify-content:space-between;padding-top:38px;padding-bottom:26px;}
+.game-header{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:16px;}
+.progress-wrap{flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,#ff6b6b,#ffd93d);border-radius:99px;transition:width .4s ease;}
+.card-count{font-size:12px;color:rgba(255,255,255,.35);margin-left:12px;white-space:nowrap;}
+.card-area{flex:1;display:flex;align-items:center;justify-content:center;width:100%;perspective:1000px;}
+.card-wrapper{width:100%;max-width:360px;height:450px;position:relative;}
+.card{width:100%;height:100%;position:absolute;border-radius:28px;cursor:pointer;
+  transition:transform .7s cubic-bezier(.175,.885,.32,1.275);transform-style:preserve-3d;}
+.card.flipped{transform:rotateY(180deg);}
+.card-face{position:absolute;inset:0;border-radius:28px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:26px 22px;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.card-back{background:linear-gradient(145deg,#1a1530,#221c3d);
+  border:1.5px solid rgba(255,255,255,.07);
+  box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);}
+.card-back-icon{font-size:68px;margin-bottom:12px;filter:drop-shadow(0 0 18px rgba(255,107,107,.3));}
+.card-back-text{font-size:13px;color:rgba(255,255,255,.22);}
+.card-front{transform:rotateY(180deg);color:#fff;text-align:center;}
+.card-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.55;margin-bottom:8px;}
+.card-question{font-family:'Bebas Neue',cursive;font-size:30px;line-height:1.2;margin-bottom:18px;}
+.vote-section{width:100%;margin-top:8px;}
+.vote-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.vote-btn{background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.18);
+  border-radius:12px;padding:8px 12px;color:#fff;
+  font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;}
+.vote-btn.selected{background:rgba(255,255,255,.92);color:#0e0b1a;border-color:#fff;transform:scale(1.05);}
+.vote-result{font-size:12px;color:rgba(255,255,255,.45);margin-top:9px;text-align:center;}
+.vote-winner{font-weight:900;color:#ffd93d;}
+.game-actions{display:flex;gap:10px;width:100%;margin-top:14px;}
+
+/* VOTING ROUND UI */
+.voter-banner{width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);
+  border-radius:14px;padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.voter-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.voter-label{font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.voter-name{font-family:'Bebas Neue',cursive;font-size:20px;color:#fff;line-height:1;}
+.voter-progress{font-size:11px;color:rgba(255,255,255,.3);margin-left:auto;}
+.vote-tally{width:100%;display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.tally-row{display:flex;align-items:center;gap:8px;padding:5px 0;}
+.tally-name{font-size:13px;font-weight:700;min-width:70px;color:rgba(255,255,255,.8);}
+.tally-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
+.tally-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#ff6b6b,#ffd93d);transition:width .4s ease;}
+.tally-count{font-family:'Bebas Neue',cursive;font-size:16px;color:#ffd93d;min-width:20px;text-align:right;}
+
+/* BOTTLE */
+#screen-bottle{gap:0;justify-content:space-between;padding-top:34px;padding-bottom:26px;}
+.bottle-header{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.bottle-title-bar{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px;}
+.bottle-round{font-size:12px;color:rgba(255,255,255,.35);}
+.bottle-arena{flex:1;display:flex;align-items:center;justify-content:center;width:100%;}
+.bottle-wheel{position:relative;width:320px;height:320px;}
+.pdot-wrap{position:absolute;}
+.pdot{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:10px;text-align:center;border:2.5px solid rgba(255,255,255,.18);
+  transition:all .5s cubic-bezier(.34,1.56,.64,1);line-height:1.2;padding:3px;color:#fff;}
+.pdot.highlighted{border-color:#ffd93d;
+  box-shadow:0 0 0 5px rgba(255,217,61,.3),0 0 30px rgba(255,217,61,.7);transform:scale(1.28);}
+#bottleWrap{position:absolute;top:50%;left:50%;
+  width:70px;height:150px;margin-left:-35px;margin-top:-75px;
+  cursor:pointer;transform-origin:50% 50%;transform:rotate(0deg);
+  will-change:transform;touch-action:manipulation;}
+@keyframes idleWiggle{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+#bottleWrap.idle-hint{animation:idleWiggle 2s ease-in-out infinite;}
+.bottle-result{width:100%;min-height:84px;background:rgba(255,255,255,.1);
+  border-radius:18px;padding:14px 18px;text-align:center;margin-top:6px;}
+.bottle-result-idle{font-size:14px;color:rgba(255,255,255,.3);}
+.bottle-result-winner{font-family:'Bebas Neue',cursive;font-size:30px;color:#ffd93d;margin-top:2px;}
+.bottle-result-challenge{font-size:13px;color:rgba(255,255,255,.65);margin-top:5px;font-style:italic;line-height:1.4;}
+.dare-badge{display:inline-block;padding:3px 12px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;}
+.badge-truth{background:rgba(77,150,255,.28);color:#6db3ff;}
+.badge-dare{background:rgba(255,107,107,.28);color:#ff8a8a;}
+.choice-winner{font-family:'Bebas Neue',cursive;font-size:26px;color:#ffd93d;margin-bottom:4px;}
+.choice-q{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:10px;}
+.choice-btns{display:flex;gap:10px;justify-content:center;}
+.choice-btn{flex:1;max-width:130px;padding:12px 8px;border:none;border-radius:14px;
+  font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;}
+.choice-btn:active{opacity:.75;}
+.choice-truth{background:linear-gradient(135deg,#4d96ff,#5c5fc4);color:#fff;box-shadow:0 6px 16px rgba(77,150,255,.4);}
+.choice-dare{background:linear-gradient(135deg,#ff6b6b,#ff4757);color:#fff;box-shadow:0 6px 16px rgba(255,71,87,.4);}
+.bottle-actions{display:flex;gap:10px;width:100%;margin-top:10px;}
+
+/* TABU */
+#screen-tabu{gap:0;justify-content:space-between;padding-top:34px;padding-bottom:26px;}
+#screen-tabu-setup{gap:12px;}
+.tabu-header{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.tabu-title-bar{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px;}
+.tabu-info{font-size:12px;color:rgba(255,255,255,.35);}
+.tabu-card-area{flex:1;display:flex;align-items:center;justify-content:center;width:100%;}
+.tabu-card{width:100%;max-width:340px;background:linear-gradient(145deg,#1e1040,#2d1a6e);
+  border:1.5px solid rgba(168,85,247,.3);border-radius:24px;
+  padding:24px 20px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;align-items:center;gap:14px;}
+.tabu-target-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.4);}
+.tabu-target-word{font-family:'Bebas Neue',cursive;font-size:44px;color:#fff;text-align:center;
+  line-height:1;text-shadow:0 0 20px rgba(168,85,247,.6);}
+.tabu-forbidden-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,107,107,.6);align-self:flex-start;margin-top:4px;}
+.tabu-forbidden-list{width:100%;display:flex;flex-direction:column;gap:6px;}
+.tabu-forbidden-item{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.25);
+  border-radius:10px;padding:9px 14px;font-weight:700;font-size:15px;color:rgba(255,255,255,.8);
+  display:flex;align-items:center;gap:8px;}
+.tabu-forbidden-item::before{content:'🚫';font-size:12px;}
+
+/* SÜRE ALANI TASARIMLARI */
+.tabu-timer-container { width: 100%; margin-top: 8px; }
+.tabu-timer-text-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px; }
+.tabu-timer-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.5); }
+.tabu-timer-value { font-family: 'Bebas Neue', cursive; font-size: 26px; color: #fff; line-height: 1; transition: color 0.3s; }
+.tabu-timer-wrap{width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
+.tabu-timer-bar{height:100%;border-radius:99px;transition: width 0.3s linear;}
+
+/* SÜRE BİTİYOR ANİMASYONLARI (KIRMIZI ALARM) */
+@keyframes flashRedBar {
+  0%, 100% { box-shadow: 0 0 5px rgba(239,68,68,0); }
+  50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); }
+}
+@keyframes pulseText {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+.timer-danger {
+  animation: flashRedBar 1s infinite;
+  background: linear-gradient(90deg,#dc2626,#ef4444) !important;
+}
+.timer-text-danger {
+  color: #ef4444 !important;
+  transform-origin: right center;
+  animation: pulseText 0.5s infinite alternate;
+}
+
+.tabu-actions{display:flex;gap:6px;width:100%;margin-top:12px;}
+.tabu-score-row{display:flex;gap:12px;width:100%;margin-bottom:4px;}
+.tabu-team{flex:1;background:rgba(255,255,255,.08);border-radius:14px;padding:12px;text-align:center;}
+.tabu-team.active-team{background:rgba(168,85,247,.2);border:1.5px solid rgba(168,85,247,.4);}
+.tabu-team-name{font-size:11px;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.tabu-team-score{font-family:'Bebas Neue',cursive;font-size:36px;color:#a855f7;margin-top:2px;}
+.tabu-team.active-team .tabu-team-score{color:#ffd93d;}
+
+/* KONFETİ */
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:999;}
+
+/* KİM BU */
+#screen-kimbu{gap:0;justify-content:flex-start;padding-top:30px;padding-bottom:24px;}
+.kb-header{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.kb-title{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px;}
+.kb-score{font-size:12px;color:rgba(255,255,255,.35);}
+.kb-category-pick{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;flex:1;justify-content:center;}
+.kb-cat-title{font-family:'Bebas Neue',cursive;font-size:32px;text-align:center;
+  background:linear-gradient(135deg,#6bcb77,#4d96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.kb-cat-cards{display:flex;gap:14px;width:100%;}
+.kb-cat-card{flex:1;border:none;border-radius:20px;padding:22px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
+.kb-cat-card:active{opacity:.8;}
+.kb-cat-futbol{background:linear-gradient(145deg,#22c55e,#16a34a);box-shadow:0 10px 28px rgba(34,197,94,.4);}
+.kb-cat-actor{background:linear-gradient(145deg,#f59e0b,#d97706);box-shadow:0 10px 28px rgba(245,158,11,.4);}
+.kb-cat-icon{font-size:48px;}
+.kb-cat-name{font-family:'Bebas Neue',cursive;font-size:22px;color:#fff;letter-spacing:.5px;}
+/* Oyun alanı */
+.kb-game-wrap{flex:1;display:flex;flex-direction:column;width:100%;gap:14px;}
+.kb-clues-box{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:8px;}
+.kb-clue-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.35);margin-bottom:2px;}
+.kb-clue-item{display:flex;align-items:center;gap:10px;padding:7px 10px;
+  background:rgba(255,255,255,.06);border-radius:10px;font-size:14px;font-weight:700;
+  color:rgba(255,255,255,.85);animation:slideIn .25s ease;}
+.kb-clue-icon{font-size:16px;flex-shrink:0;}
+.kb-hint-btn{background:rgba(255,255,255,.08);border:1.5px dashed rgba(255,255,255,.2);
+  border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;color:rgba(255,255,255,.4);
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;width:100%;text-align:center;}
+/* Tahmin alanı */
+.kb-guess-area{display:flex;flex-direction:column;gap:10px;}
+.kb-blanks{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:44px;align-items:center;}
+.kb-blank-word{display:flex;gap:3px;}
+.kb-letter{width:22px;height:30px;border-bottom:2.5px solid rgba(255,255,255,.4);
+  display:flex;align-items:flex-end;justify-content:center;
+  font-family:'Bebas Neue',cursive;font-size:20px;color:#ffd93d;padding-bottom:2px;
+  transition:all .3s;}
+.kb-letter.revealed{border-color:#ffd93d;}
+.kb-letter.wrong-flash{border-color:#ff6b6b;animation:wrongFlash .4s ease;}
+@keyframes wrongFlash{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.kb-input-row{display:flex;gap:10px;}
+.kb-input{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.15);
+  border-radius:12px;padding:13px 15px;color:#fff;font-family:'Nunito',sans-serif;
+  font-size:16px;outline:none;text-transform:uppercase;}
+.kb-input:focus{border-color:rgba(255,217,61,.5);}
+.kb-submit-btn{background:linear-gradient(135deg,#ffd93d,#f59e0b);border:none;border-radius:12px;
+  width:54px;height:54px;font-size:22px;cursor:pointer;flex-shrink:0;
+  touch-action:manipulation;-webkit-appearance:none;}
+/* Sonuç */
+.kb-result-win{text-align:center;padding:16px;background:rgba(34,197,94,.15);
+  border:1.5px solid rgba(34,197,94,.35);border-radius:18px;}
+.kb-result-lose{text-align:center;padding:16px;background:rgba(255,107,107,.12);
+  border:1.5px solid rgba(255,107,107,.3);border-radius:18px;}
+.kb-result-title{font-family:'Bebas Neue',cursive;font-size:28px;}
+.kb-result-name{font-size:14px;color:rgba(255,255,255,.6);margin-top:4px;}
+.kb-score-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,217,61,.2);
+  border:1px solid rgba(255,217,61,.4);border-radius:20px;padding:4px 14px;
+  font-size:13px;font-weight:700;color:#ffd93d;margin-top:8px;}
+.kb-tries{font-size:12px;color:rgba(255,255,255,.3);text-align:center;}
+
+/* ── QUIZ OYUNU ── */
+#screen-quiz{gap:0;justify-content:flex-start;padding-top:28px;padding-bottom:22px;}
+
+/* Seri seçim grid */
+.quiz-series-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:4px;}
+.quiz-series-btn{border:none;border-radius:18px;padding:16px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;
+  transition:transform .15s,opacity .15s;position:relative;overflow:hidden;}
+.quiz-series-btn:active{transform:scale(.96);opacity:.85;}
+.quiz-series-emoji{font-size:34px;line-height:1;}
+.quiz-series-name{font-family:'Bebas Neue',cursive;font-size:16px;color:#fff;
+  letter-spacing:.5px;text-align:center;line-height:1.2;}
+.quiz-series-count{font-size:10px;color:rgba(255,255,255,.5);font-weight:700;}
+
+/* Header progress */
+.quiz-header{width:100%;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.quiz-top-row{display:flex;justify-content:space-between;align-items:center;}
+.quiz-series-label{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:.5px;
+  color:rgba(255,255,255,.7);}
+.quiz-pts{font-size:12px;color:rgba(255,255,255,.35);}
+.quiz-prog-wrap{height:4px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
+.quiz-prog-bar{height:100%;border-radius:99px;transition:width .4s ease;}
+
+/* Soru kartı */
+.quiz-q-area{flex:1;display:flex;align-items:center;justify-content:center;width:100%;}
+.quiz-card{width:100%;background:linear-gradient(145deg,#1a1530,#211940);
+  border:1.5px solid rgba(255,255,255,.08);border-radius:24px;
+  padding:20px 18px;box-shadow:0 16px 40px rgba(0,0,0,.45);
+  display:flex;flex-direction:column;gap:14px;}
+.quiz-q-num{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.3);}
+.quiz-q-text{font-size:16px;font-weight:700;color:#fff;line-height:1.4;min-height:44px;}
+.quiz-choices{display:flex;flex-direction:column;gap:8px;}
+.quiz-choice{width:100%;border:1.5px solid rgba(255,255,255,.14);border-radius:14px;
+  background:rgba(255,255,255,.07);padding:13px 16px;
+  display:flex;align-items:center;gap:12px;
+  font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:#fff;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;
+  transition:all .2s;text-align:left;}
+.quiz-choice:active{transform:scale(.98);}
+.quiz-choice-letter{width:26px;height:26px;border-radius:8px;
+  background:rgba(255,255,255,.12);display:flex;align-items:center;
+  justify-content:center;font-family:'Bebas Neue',cursive;font-size:16px;
+  flex-shrink:0;transition:background .2s;}
+/* Seçim sonrası renkler */
+.quiz-choice.correct{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.6);}
+.quiz-choice.correct .quiz-choice-letter{background:#22c55e;color:#fff;}
+.quiz-choice.wrong{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.4);}
+.quiz-choice.wrong .quiz-choice-letter{background:#ff4757;color:#fff;}
+.quiz-choice.disabled{opacity:.55;cursor:default;}
+
+/* Açıklama kutusu */
+.quiz-explain{font-size:13px;color:rgba(255,255,255,.55);line-height:1.45;
+  background:rgba(255,255,255,.05);border-radius:12px;padding:10px 14px;
+  border-left:3px solid rgba(255,255,255,.15);display:none;}
+.quiz-explain.show{display:block;animation:slideIn .25s ease;}
+
+/* Alt butonlar */
+.quiz-footer{display:flex;gap:10px;width:100%;margin-top:8px;}
+
+/* Sonuç ekranı */
+.quiz-result-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;
+  width:100%;flex:1;justify-content:center;text-align:center;}
+.quiz-result-emoji{font-size:64px;animation:bounce 1.5s infinite;}
+.quiz-result-title{font-family:'Bebas Neue',cursive;font-size:44px;
+  background:linear-gradient(135deg,#ffd93d,#ff6b6b);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.quiz-result-score{font-size:18px;color:rgba(255,255,255,.7);}
+.quiz-result-score b{color:#ffd93d;font-size:28px;}
+.quiz-streak{font-size:13px;color:rgba(255,255,255,.4);}
+
+/* O MU BU MU (OMB) */
+#screen-omb-setup{gap:12px;}
+#screen-omb{gap:0;padding:0;justify-content:center; background:transparent;}
+.omb-arena{width:100%;height:100vh;display:flex;flex-direction:column;position:relative;}
+.omb-header{position:absolute;top:20px;left:0;width:100%;display:flex;flex-direction:column;align-items:center;z-index:10;pointer-events:none;gap:4px;}
+.omb-round-text{background:rgba(0,0,0,.6);padding:6px 16px;border-radius:20px;font-family:'Bebas Neue',cursive;font-size:24px;color:#fff;letter-spacing:1px;border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(5px);}
+.omb-progress{font-size:12px;font-weight:700;color:rgba(255,255,255,.7);background:rgba(0,0,0,.5);padding:4px 12px;border-radius:12px;}
+.omb-card{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;text-align:center;cursor:pointer;transition:transform .2s;position:relative;overflow:hidden;-webkit-appearance:none;border:none; background:transparent;}
+.omb-card:active{transform:scale(0.95);}
+.omb-text{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#fff;line-height:1.4;padding:12px 24px;display:inline-block;border-radius:255px 15px 225px 15px/15px 225px 15px 255px;box-shadow:0 4px 15px rgba(0,0,0,.4);transition:background 0.3s ease;}
+.omb-vs-circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:#0e0b1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:24px;color:#ffd93d;z-index:5;border:4px solid #fff;box-shadow:0 0 20px rgba(0,0,0,.5);}
+.omb-quit{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:14px;font-size:12px;font-weight:700;}
+#screen-omb-result{gap:16px;}
+.omb-winner-card{background:linear-gradient(135deg,#ffd93d,#f59e0b);border-radius:24px;padding:30px 20px;text-align:center;box-shadow:0 15px 40px rgba(245,158,11,.4);width:100%;margin-bottom:10px;}
+.omb-winner-label{font-size:12px;font-weight:900;letter-spacing:2px;color:rgba(0,0,0,.5);margin-bottom:10px;}
+.omb-winner-text{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:#0e0b1a;}
+
+
+/* SCORE */
+#screen-score{gap:18px;}
+.score-title{font-family:'Bebas Neue',cursive;font-size:46px;
+  background:linear-gradient(135deg,#ffd93d,#ff6b6b);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;}
+.score-list{width:100%;display:flex;flex-direction:column;gap:9px;}
+.score-item{display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.1);
+  border-radius:15px;padding:13px 17px;animation:slideIn .3s ease both;}
+.score-rank{font-family:'Bebas Neue',cursive;font-size:26px;width:34px;text-align:center;color:rgba(255,255,255,.28);}
+.score-item.top1{background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(255,107,107,.13));
+  border:1px solid rgba(255,215,0,.28);}
+.score-item.top1 .score-rank{color:#ffd93d;}
+.score-player{flex:1;font-weight:700;font-size:15px;}
+.score-votes{font-family:'Bebas Neue',cursive;font-size:20px;color:#ff6b6b;}
+.score-votes span{font-family:'Nunito',sans-serif;font-size:11px;color:rgba(255,255,255,.35);}
+.game-over-emoji{font-size:56px;animation:bounce 1.5s infinite;}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div id="screen-splash" class="screen active">
+  <span class="splash-emoji">🎉</span>
+  <div><div class="splash-title">Parti Oyunları</div>
+    <div class="splash-sub">Eğlence başlıyor!</div></div>
+  <button class="btn btn-red" id="btnShowPick">Oyun Seç 🎮</button>
+  <button class="btn btn-secondary" id="btnShowScore">🏆 Skor Tablosu</button>
+</div>
+
+<div id="screen-pick" class="screen">
+  <div class="pick-title">Hangi Oyunu Oynayalım?</div>
+  <div class="game-cards">
+    <button class="game-card gc-mlto" id="btnPickMlto">
+      <div class="gc-icon">🃏</div>
+      <div><div class="gc-name">En Çok Kim?</div>
+        <div class="gc-desc">Most Likely To • Kartları çevir, oy ver</div></div>
+    </button>
+    <button class="game-card gc-bottle" id="btnPickBottle">
+      <div class="gc-icon">🍺</div>
+      <div><div class="gc-name">Şişe Çevirme</div>
+        <div class="gc-desc">Spin the Bottle • Doğruluk mu, Cesaret mi?</div></div>
+    </button>
+    <button class="game-card gc-tabu" id="btnPickTabu">
+      <div class="gc-icon">🤫</div>
+      <div><div class="gc-name">Tabu</div>
+        <div class="gc-desc">Yasak kelimeler • Takımını seç</div></div>
+    </button>
+    <button class="game-card" id="btnPickKimbu" style="background:linear-gradient(135deg,#6bcb77,#2d8a4e);box-shadow:0 10px 28px rgba(107,203,119,.35);">
+      <div class="gc-icon">🔍</div>
+      <div><div class="gc-name">Kim Bu?</div>
+        <div class="gc-desc">Futbolcu veya aktör • İpuçlarıyla tahmin et</div></div>
+    </button>
+    <button class="game-card" id="btnPickOmuBumu" style="background:linear-gradient(135deg,#ec4899,#db2777);box-shadow:0 10px 28px rgba(236,72,153,.35);">
+      <div class="gc-icon">⚖️</div>
+      <div><div class="gc-name">O mu, Bu mu?</div>
+        <div class="gc-desc">Zor seçimler • Turnuva &amp; Kral Modu</div></div>
+    </button>
+    <button class="game-card" id="btnPickQuiz" style="background:linear-gradient(135deg,#06b6d4,#0e7490);box-shadow:0 10px 28px rgba(6,182,212,.35);">
+      <div class="gc-icon">🎬</div>
+      <div><div class="gc-name">Dizi & Film Quiz</div>
+        <div class="gc-desc">Breaking Bad • HIMYM • GOT ve daha fazlası</div></div>
+    </button>
+    <button class="game-card" id="btnPickWave" style="background:linear-gradient(135deg,#3b82f6,#1e3a8a);box-shadow:0 10px 28px rgba(59,130,246,.35);">
+      <div class="gc-icon">📻</div>
+      <div><div class="gc-name">Wavelength</div>
+        <div class="gc-desc">Telepati oyunu • İpucu ver, hedefi bul</div></div>
+    </button>
+  </div>
+  <button class="btn btn-ghost" id="btnPickBack">← Geri</button>
+</div>
+
+<div id="screen-wave" class="screen">
+  <div class="tabu-header">
+    <div class="tabu-title-bar">📻 Wavelength</div>
+    <div class="tabu-info" id="waveScoreText">Tur: 1 | Skor: 0</div>
+  </div>
+  
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; width:100%; gap:20px;">
+    <div style="text-align:center;">
+      <div style="font-size:12px; color:rgba(255,255,255,.5); margin-bottom:10px; font-weight:700; letter-spacing:1px;">KONSEPT</div>
+      <div style="display:flex; justify-content:space-between; font-family:'Bebas Neue', cursive; font-size:28px; background:rgba(255,255,255,.05); padding:15px; border-radius:16px;">
+        <span id="waveLeft" style="color:#ef4444; width:45%; text-align:left; word-wrap:break-word;">SOL</span>
+        <span style="color:rgba(255,255,255,.3);">—</span>
+        <span id="waveRight" style="color:#3b82f6; width:45%; text-align:right; word-wrap:break-word;">SAĞ</span>
+      </div>
+    </div>
+
+    <div style="position:relative; width:300px; height:150px; margin: 0 auto;">
+      <div id="waveDialContainer" style="position:absolute; width: 300px; height: 150px; overflow: hidden; border-radius: 150px 150px 0 0; background: #1a1530; border: 3px solid rgba(255,255,255,.2); border-bottom: none; touch-action: none;">
+        
+        <div id="waveTargetWedge" style="position:absolute; bottom:-150px; left:0; width:300px; height:300px; border-radius:50%; 
+          background: conic-gradient(from -25deg at 50% 50%, transparent 0, #f59e0b 0 10deg, #ffd93d 10deg 20deg, #22c55e 20deg 30deg, #ffd93d 30deg 40deg, #f59e0b 40deg 50deg, transparent 50deg); 
+          transform: rotate(0deg); opacity: 0; transition: opacity 0.3s;">
+        </div>
+
+        <div style="position:absolute; bottom:0; left:149px; width:2px; height:10px; background:rgba(255,255,255,.3);"></div>
+        <div style="position:absolute; bottom:0; left:14px; width:10px; height:2px; background:rgba(255,255,255,.3);"></div>
+        <div style="position:absolute; bottom:0; right:14px; width:10px; height:2px; background:rgba(255,255,255,.3);"></div>
+
+        <div id="waveNeedle" style="position:absolute; bottom:0; left:146px; width:8px; height:120px; background:#ef4444; transform-origin: bottom center; transform: rotate(0deg); border-radius:4px 4px 0 0; box-shadow:0 0 10px rgba(0,0,0,.5); pointer-events:none; transition: transform 0.05s linear;"></div>
+        
+        <div style="position:absolute; bottom:-12px; left:138px; width:24px; height:24px; background:#fff; border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,.5); pointer-events:none;"></div>
+      </div>
+    </div>
+
+    <div id="waveTargetArea" style="text-align:center;">
+      <button class="btn btn-secondary" id="btnWaveReveal">🎯 Hedef Bölgeyi Gör</button>
+      <div id="waveClueHint" style="display:none; font-size:13px; color:rgba(255,255,255,.6); margin-top:5px; line-height:1.4;">
+        Grubuna hedefin yerini belli edecek <b>tek bir şey</b> söyle, sonra ekranı gizle.
+      </div>
+      <button class="btn btn-purple" id="btnWaveHide" style="display:none; margin-top:14px; background:linear-gradient(135deg,#3b82f6,#1d4ed8);">Ekranı Gizle (Sıra Takımda)</button>
+    </div>
+
+    <div id="waveGuessArea" style="display:none; flex-direction:column; gap:10px; text-align:center;">
+      <div style="font-size:14px; font-weight:700; color:#ffd93d; margin-bottom:5px;">Yarım daire üzerinde ibreyi kaydırarak tahmini yap!</div>
+      <button class="btn btn-green" id="btnWaveSubmit">Cevabı Kilitle 🚀</button>
+    </div>
+
+    <div id="waveResultArea" style="display:none; flex-direction:column; gap:12px; text-align:center; background:rgba(255,255,255,.05); padding:20px; border-radius:16px;">
+      <div id="wavePts" style="font-family:'Bebas Neue', cursive; font-size:36px; margin-top:5px;"></div>
+      <button class="btn" id="btnWaveNext" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; margin-top:10px;">Sıradaki Tur →</button>
+    </div>
+  </div>
+  
+  <button class="btn btn-ghost" id="btnWaveHome">← Ana Sayfa</button>
+</div>
+  
+ <div id="screen-quiz" class="screen">
+  <div id="quizSeriesPick" style="display:flex;flex-direction:column;gap:14px;width:100%;flex:1;justify-content:center;">
+    <div style="font-family:'Bebas Neue',cursive;font-size:32px;text-align:center;
+      background:linear-gradient(135deg,#06b6d4,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+      Hangi Seri?
+    </div>
+    <div class="quiz-series-grid" id="quizSeriesGrid"></div>
+    <button class="btn btn-ghost" id="btnQuizBack">← Geri</button>
+  </div>
+
+  <div id="quizGameArea" style="display:none;flex-direction:column;width:100%;flex:1;gap:0;">
+    <div class="quiz-header">
+      <div class="quiz-top-row">
+        <div class="quiz-series-label" id="quizSeriesLabel">—</div>
+        <div class="quiz-pts" id="quizPts">0 puan</div>
+      </div>
+      <div class="quiz-prog-wrap">
+        <div class="quiz-prog-bar" id="quizProgBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="quiz-q-area">
+      <div class="quiz-card">
+        <div class="quiz-q-num" id="quizQNum">Soru 1 / 10</div>
+        <div class="quiz-q-text" id="quizQText">—</div>
+        <div class="quiz-choices" id="quizChoices"></div>
+        <div class="quiz-explain" id="quizExplain"></div>
+      </div>
+    </div>
+    <div class="quiz-footer">
+      <button class="btn btn-ghost btn-small" id="btnQuizHome" style="flex:0">🏠</button>
+      <button class="btn btn-secondary btn-small" id="btnQuizSkip" style="flex:1">Geç ⏭</button>
+      <button class="btn" id="btnQuizNext" style="flex:1;display:none;background:linear-gradient(135deg,#06b6d4,#0e7490);color:#fff;">Sonraki →</button>
+    </div>
+  </div>
+
+  <div id="quizResultArea" style="display:none;flex-direction:column;width:100%;flex:1;">
+    <div class="quiz-result-wrap">
+      <div class="quiz-result-emoji" id="quizResEmoji">🏆</div>
+      <div class="quiz-result-title">Bitti!</div>
+      <div class="quiz-result-score">Toplam: <b id="quizResPts">0</b> puan</div>
+      <div class="quiz-streak" id="quizResStreak"></div>
+      <button class="btn" style="max-width:260px;background:linear-gradient(135deg,#06b6d4,#0e7490);color:#fff;" id="btnQuizRestart">Tekrar Oyna 🔄</button>
+      <button class="btn btn-ghost" id="btnQuizHomeEnd">← Ana Sayfa</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-kimbu" class="screen">
+  <div class="kb-header">
+    <div class="kb-title">🔍 Kim Bu?</div>
+    <div class="kb-score" id="kbScore">0 puan</div>
+  </div>
+
+  <div class="kb-category-pick" id="kbCategoryPick">
+    <div class="kb-cat-title">Kategori Seç</div>
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);text-align:center;">🌍 YABANCI</div>
+      <div class="kb-cat-cards">
+        <button class="kb-cat-card kb-cat-futbol" id="btnKbFutbol">
+          <div class="kb-cat-icon">⚽</div>
+          <div class="kb-cat-name">Futbolcu</div>
+        </button>
+        <button class="kb-cat-card kb-cat-actor" id="btnKbActor">
+          <div class="kb-cat-icon">🎬</div>
+          <div class="kb-cat-name">Aktör</div>
+        </button>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);text-align:center;margin-top:4px;">🇹🇷 TÜRK</div>
+      <div class="kb-cat-cards">
+        <button class="kb-cat-card" id="btnKbTurkFutbol" style="background:linear-gradient(145deg,#dc2626,#991b1b);box-shadow:0 10px 28px rgba(220,38,38,.4);">
+          <div class="kb-cat-icon">⚽</div>
+          <div class="kb-cat-name">Futbolcu</div>
+        </button>
+        <button class="kb-cat-card" id="btnKbTurkActor" style="background:linear-gradient(145deg,#7c3aed,#5b21b6);box-shadow:0 10px 28px rgba(124,58,237,.4);">
+          <div class="kb-cat-icon">🎬</div>
+          <div class="kb-cat-name">Aktör/Dizi</div>
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-ghost" id="btnKbBack" style="margin-top:8px">← Geri</button>
+  </div>
+
+  <div class="kb-game-wrap" id="kbGameWrap" style="display:none;">
+    <div class="kb-clues-box">
+      <div class="kb-clue-label" id="kbClueLabel">İPUÇLARI</div>
+      <div id="kbCluesList"></div>
+      <button class="kb-hint-btn" id="btnKbHint">💡 İpucu Göster</button>
+    </div>
+    <div class="kb-guess-area">
+      <div class="kb-blanks" id="kbBlanks"></div>
+      <div class="kb-tries" id="kbTries">3 hakkın var</div>
+      <div class="kb-input-row">
+        <input type="text" class="kb-input" id="kbInput" placeholder="TAHMİN ET..." maxlength="40" autocomplete="off">
+        <button class="kb-submit-btn" id="btnKbSubmit">→</button>
+      </div>
+    </div>
+    <div id="kbResultBox"></div>
+    <div style="display:flex;gap:10px;margin-top:auto;">
+      <button class="btn btn-secondary btn-small" id="btnKbSkipQ" style="flex:1">Geç ⏭</button>
+      <button class="btn btn-green btn-small" id="btnKbNext" style="flex:1;display:none">Sonraki →</button>
+      <button class="btn btn-ghost btn-small" id="btnKbHome2" style="flex:0">🏠</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-setup" class="screen">
+  <div class="section-title">👥 Oyuncular</div>
+  <div class="players-list" id="playersList"></div>
+  <div class="input-row">
+    <input type="text" id="playerInput" placeholder="İsim gir..." maxlength="16">
+    <button class="add-btn" id="btnAddPlayer">+</button>
+  </div>
+  <div id="mltOptions">
+    <div class="section-title" style="margin-top:4px">🎮 Oyun Modu</div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="modeVote">🗳️ Oy Ver</button>
+      <button class="mode-tab" id="modeCard">🃏 Kart Çek</button>
+    </div>
+    <p class="hint" id="modeHint">Herkes grubun en çok kimi seçeceğini oylayacak</p>
+    <div class="section-title">🔢 Soru Sayısı</div>
+    <div class="mode-tabs" id="qCountTabs">
+      <button class="mode-tab" data-q="5">5</button>
+      <button class="mode-tab active" data-q="10">10</button>
+      <button class="mode-tab" data-q="15">15</button>
+      <button class="mode-tab" data-q="30">Tümü</button>
+    </div>
+  </div>
+  <button class="btn" id="btnStartGame" style="margin-top:4px">Oyuna Başla 🚀</button>
+  <button class="btn btn-ghost" id="btnSetupBack">← Geri</button>
+</div>
+
+<div id="screen-tabu-setup" class="screen">
+  <div class="section-title" style="margin-bottom: -10px;">🤫 Tabu Kurulumu</div>
+  
+  <div class="section-title" style="font-size:18px; margin-top:10px;">👥 Takımlar</div>
+  <div class="players-list" id="tabuPlayersList" style="max-height: 120px;"></div>
+  <div class="input-row">
+    <input type="text" id="tabuPlayerInput" placeholder="Takım adı gir..." maxlength="16">
+    <button class="add-btn" id="btnTabuAddPlayer">+</button>
+  </div>
+
+  <div class="section-title" style="font-size:18px; margin-top:4px;">📂 Kategori</div>
+  <div class="mode-tabs" style="flex-wrap: wrap; gap: 4px;">
+    <button class="mode-tab active" data-tabu-cat="genel">🌍 Genel</button>
+    <button class="mode-tab" data-tabu-cat="ev">🛋️ Ev</button>
+    <button class="mode-tab" data-tabu-cat="spor">⚽ Spor</button>
+    <button class="mode-tab" data-tabu-cat="sinema">🎬 Sinema</button>
+  </div>
+
+  <div style="display: flex; gap: 10px; width: 100%;">
+    <div style="flex:1;">
+      <div class="section-title" style="font-size:18px; margin-top:4px;">⏱️ Süre</div>
+      <div class="mode-tabs" style="flex-wrap:wrap;">
+        <button class="mode-tab" data-tabu-time="30">30s</button>
+        <button class="mode-tab active" data-tabu-time="60">60s</button>
+        <button class="mode-tab" data-tabu-time="90">90s</button>
+        <button class="mode-tab" data-tabu-time="120">120s</button>
+      </div>
+    </div>
+    <div style="flex:1;">
+      <div class="section-title" style="font-size:18px; margin-top:4px;">💪 Zorluk</div>
+      <div class="mode-tabs" style="flex-wrap:wrap;">
+        <button class="mode-tab active" data-diff="easy">😊</button>
+        <button class="mode-tab" data-diff="medium">😤</button>
+        <button class="mode-tab" data-diff="hard">🔥</button>
+      </div>
+    </div>
+  </div>
+  
+  <p class="hint" id="tabuDiffHint" style="margin-top: 5px;">Kolay: Sadece 3 yasak kelime gösterilir</p>
+
+  <button class="btn btn-purple" id="btnStartTabu">Oyuna Başla 🤫</button>
+  <button class="btn btn-ghost" id="btnTabuSetupBack" style="padding: 0;">← Geri</button>
+</div>
+
+<div id="screen-game" class="screen">
+  <div class="game-header">
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+    <div class="card-count" id="cardCount">1/10</div>
+  </div>
+  <div class="card-area">
+    <div class="card-wrapper">
+      <div class="card" id="mainCard">
+        <div class="card-face card-back">
+          <div class="card-back-icon">🃏</div>
+          <div class="card-back-text">Açmak için dokun</div>
+        </div>
+        <div class="card-face card-front">
+          <div class="card-label">EN ÇOK KİM?</div>
+          <div class="card-question" id="cardQuestion"></div>
+          <div class="vote-section" id="voteSection"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="game-actions">
+    <button class="btn btn-secondary btn-small" id="btnGameSetup" style="flex:0">⚙️</button>
+    <button class="btn btn-red" id="btnNextCard" style="flex:1">Sonraki →</button>
+  </div>
+</div>
+
+<div id="screen-bottle" class="screen">
+  <div class="bottle-header">
+    <div class="bottle-title-bar">🍺 Şişe Çevirme</div>
+    <div class="bottle-round" id="bottleRound">Tur 1</div>
+  </div>
+  <div class="bottle-arena">
+    <div class="bottle-wheel" id="bottleWheel">
+      <div id="bottleWrap" class="idle-hint">
+        <svg viewBox="0 0 70 150" width="70" height="150" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="beerBody" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#7a4a10"/>
+              <stop offset="25%" stop-color="#c47a20"/>
+              <stop offset="50%" stop-color="#e8950a"/>
+              <stop offset="75%" stop-color="#c47a20"/>
+              <stop offset="100%" stop-color="#6a3a08"/>
+            </linearGradient>
+            <linearGradient id="beerNeck" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#6a3a08"/>
+              <stop offset="50%" stop-color="#c47a20"/>
+              <stop offset="100%" stop-color="#5a3006"/>
+            </linearGradient>
+            <linearGradient id="beerCap" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#888"/>
+              <stop offset="40%" stop-color="#ddd"/>
+              <stop offset="100%" stop-color="#999"/>
+            </linearGradient>
+            <linearGradient id="beerLabel" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#f5e642"/>
+              <stop offset="100%" stop-color="#d4c020"/>
+            </linearGradient>
+            <filter id="arrowGlow">
+              <feGaussianBlur stdDeviation="2.5" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <rect x="12" y="105" width="46" height="36" rx="8" fill="url(#beerBody)"/>
+          <ellipse cx="35" cy="141" rx="23" ry="8" fill="url(#beerBody)"/>
+          <ellipse cx="35" cy="147" rx="18" ry="4" fill="rgba(0,0,0,.25)"/>
+          <path d="M12,105 Q12,88 22,80 L22,105Z" fill="url(#beerBody)"/>
+          <path d="M58,105 Q58,88 48,80 L48,105Z" fill="url(#beerBody)"/>
+          <rect x="22" y="80" width="26" height="25" fill="url(#beerBody)"/>
+          <rect x="25" y="44" width="20" height="40" rx="4" fill="url(#beerNeck)"/>
+          <ellipse cx="35" cy="44" rx="12" ry="5" fill="url(#beerCap)"/>
+          <rect x="23" y="36" width="24" height="12" rx="3" fill="url(#beerCap)"/>
+          <path d="M23,40 L26,34 L29,40 L32,34 L35,40 L38,34 L41,40 L44,34 L47,40"
+                fill="none" stroke="#aaa" stroke-width="1.5" stroke-linejoin="round"/>
+          <rect x="14" y="108" width="42" height="26" rx="4" fill="url(#beerLabel)" opacity=".95"/>
+          <line x1="17" y1="114" x2="53" y2="114" stroke="rgba(0,0,0,.15)" stroke-width=".8"/>
+          <line x1="17" y1="129" x2="53" y2="129" stroke="rgba(0,0,0,.15)" stroke-width=".8"/>
+          <text x="35" y="124" text-anchor="middle" font-size="6.5" font-family="Arial,sans-serif"
+                fill="#5a3e00" font-weight="bold" letter-spacing="1.5">PARTY</text>
+          <rect x="16" y="84" width="4" height="48" rx="2" fill="rgba(255,255,255,.25)"/>
+          <rect x="27" y="48" width="3" height="30" rx="1.5" fill="rgba(255,255,255,.2)"/>
+          <rect x="26" y="58" width="18" height="22" rx="2" fill="rgba(255,180,30,.25)"/>
+          <polygon points="35,2 28,18 42,18" fill="#ffd93d" filter="url(#arrowGlow)"/>
+          <polygon points="35,6 30,18 40,18" fill="rgba(255,245,120,.55)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="bottle-result" id="bottleResult">
+    <div class="bottle-result-idle">Şişeye dokun ve çevir! 🍺</div>
+  </div>
+  <div class="bottle-actions">
+    <button class="btn btn-secondary btn-small" id="btnBottleSetup" style="flex:0">⚙️</button>
+    <button class="btn btn-amber" id="spinBtn" style="flex:1">Çevir! 🍺</button>
+    <button class="btn btn-secondary btn-small" id="btnBottleScore" style="flex:0">🏆</button>
+  </div>
+</div>
+
+<div id="screen-tabu" class="screen">
+  <div class="tabu-header">
+    <div class="tabu-title-bar">🤫 Tabu</div>
+    <div class="tabu-info" id="tabuInfo">Kart 1</div>
+  </div>
+  <div class="tabu-score-row" id="tabuScoreRow"></div>
+  <div class="tabu-card-area">
+    <div class="tabu-card" id="tabuCard">
+      <div class="tabu-target-label">TAHMİN EDİLECEK KELİME</div>
+      <div class="tabu-target-word" id="tabuWord">—</div>
+      <div class="tabu-forbidden-label">YASAK KELİMELER</div>
+      <div class="tabu-forbidden-list" id="tabuForbidden"></div>
+      
+      <div class="tabu-timer-container">
+        <div class="tabu-timer-text-row">
+          <span class="tabu-timer-label">KALAN SÜRE</span>
+          <span class="tabu-timer-value" id="tabuTimerText">60s</span>
+        </div>
+        <div class="tabu-timer-wrap">
+          <div class="tabu-timer-bar" id="tabuTimerBar" style="width:100%;background:linear-gradient(90deg,#22c55e,#86efac)"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="tabu-actions">
+    <button class="btn btn-secondary btn-small" id="btnTabuSetup2" style="flex:0; padding:12px 14px;">⚙️</button>
+    <button class="btn btn-red" id="btnTabuMistake" style="flex:1; font-size:13px; padding:12px 5px;">🚫 Tabu</button>
+    <button class="btn btn-orange" id="btnTabuSkip" style="flex:1; font-size:13px; padding:12px 5px;">⏭ Pas (3)</button>
+    <button class="btn btn-green" id="btnTabuCorrect" style="flex:1; font-size:13px; padding:12px 5px;">✓ Doğru</button>
+  </div>
+</div>
+
+<div id="screen-omb-setup" class="screen">
+  <div class="section-title">⚖️ O mu, Bu mu?</div>
+  <div class="section-title" style="font-size:18px;margin-top:10px">Kategori</div>
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-omb-cat="good">😎 İyi Şeyler</button>
+    <button class="mode-tab" data-omb-cat="bad">😱 Kötü Şeyler</button>
+  </div>
+  <div class="section-title" style="font-size:18px;margin-top:10px">Oyun Modu</div>
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-omb-mode="tournament">🏆 Turnuva</button>
+    <button class="mode-tab" data-omb-mode="king">👑 Kral Modu</button>
+  </div>
+  <p class="hint" id="ombModeHint">Turnuva: Eşleşerek finale çıkılır. Kral: Seçilen kalır, yeni rakip gelir.</p>
+  <div class="section-title" style="font-size:18px;margin-top:10px">Seçenek Sayısı</div>
+  <div class="mode-tabs">
+    <button class="mode-tab" data-omb-count="16">16</button>
+    <button class="mode-tab active" data-omb-count="32">32</button>
+    <button class="mode-tab" data-omb-count="64">64</button>
+  </div>
+  <button class="btn btn-purple" id="btnStartOmuBumu" style="margin-top:14px;background:linear-gradient(135deg,#ec4899,#be185d);">Oyuna Başla 🚀</button>
+  <button class="btn btn-ghost" id="btnOmbSetupBack">← Geri</button>
+</div>
+<div id="screen-omb" class="screen">
+  <div class="omb-arena">
+    <div class="omb-header">
+      <div class="omb-round-text" id="ombRoundText">YARI FİNAL</div>
+      <div class="omb-progress" id="ombProgressText">Maç 1/2</div>
+    </div>
+    <button class="omb-card" id="btnOmbTop">
+      <span class="omb-text" id="ombTextTop">Seçenek 1</span>
+    </button>
+    <div class="omb-vs-circle">VS</div>
+    <button class="omb-card" id="btnOmbBottom">
+      <span class="omb-text" id="ombTextBottom">Seçenek 2</span>
+    </button>
+    <button class="omb-quit" id="btnOmbQuit">Çıkış Yap</button>
+  </div>
+</div>
+<div id="screen-omb-result" class="screen">
+  <div class="game-over-emoji">👑</div>
+  <div class="score-title" style="font-size:36px;color:#ffd93d;">KAZANAN</div>
+  <div class="omb-winner-card">
+    <div class="omb-winner-label">NİHAİ SEÇİMİNİZ</div>
+    <div class="omb-winner-text" id="ombWinnerText">—</div>
+  </div>
+  <button class="btn" id="btnOmbReplay" style="background:linear-gradient(135deg,#ec4899,#be185d);color:#fff;">Tekrar Oyna 🔄</button>
+  <button class="btn btn-ghost" id="btnOmbHome">← Ana Sayfa</button>
+</div>
+<div id="screen-score" class="screen">
+  <div class="game-over-emoji">🏆</div>
+  <div class="score-title">Skor Tablosu</div>
+  <div class="score-list" id="scoreList"></div>
+  <button class="btn btn-red" id="btnReplay">Tekrar Oyna 🔄</button>
+  <button class="btn btn-ghost" id="btnScoreHome">← Ana Sayfa</button>
+</div>
+
+<script>
+/* ══════════════ DATA ══════════════ */
+const DOT_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9f43','#00d2d3','#ff9ff3'];
+
+const MLT_QUESTIONS=[
+  "Sabah en geç uyanan","Sınıfta ders dinlemeyen","En çok yalan söyleyen",
+  "En uzun süre ilişkide kalan","Arkadaşını satan","Para harcamayı en çok seven",
+  "En gürültülü gülen","Herkese aşık olan","Telefona en çok bağımlı olan",
+  "En abartılı hikaye anlatan","En tembel olan","En çok selfie çeken",
+  "Grubu her zaman güldüren","En utangaç olan","Gece en geç uyuyan",
+  "En çok yemek yiyen","Herkese en çok laf yetiştiren","Plansız şeyler yapan",
+  "En çok drama çıkaran","Bir gün çok ünlü olacak","En çok uyuyan",
+  "Parayı en çabuk bitiren","En iyi dans eden","Ruh hali en çok değişen",
+  "En çok film izleyen","Pişmanlık duymadan bir şey yapan","Sırrını en kötü saklayan",
+  "En romantik olan","Garsonla flört eden","Asla zamanında gelmeyen",
+];
+const TRUTHS=[
+  "En utanç verici anını anlat","İlk crush'ın kim?","En büyük sırrın ne?",
+  "Hiç kimseye söylemediğin bir şeyi itiraf et","En son ne zaman ağladın?",
+  "Gruptaki en çok kimi beğeniyorsun?","Hayatının en büyük pişmanlığı ne?",
+  "En son ne hakkında yalan söyledin?","Gizli yeteneğin ne?",
+  "Şu ana kadar yaptığın en aptalca şey neydi?",
+];
+const DARES=[
+  "Bir sonraki tura kadar komik sesle konuş","Yanındaki kişiyle 10 saniye göz teması kur",
+  "Gruba bir şarkı söyle","Gruptaki birine iltifat et","10 şınav çek",
+  "Gruptaki birine dans et","Telefonunun son fotoğrafını göster",
+  "Kendini 3 kelimeyle tanıt","En yakın arkadaşını taklit et",
+  "Grubun seçtiği birini komik sesle ara",
+];
+
+/* ══════════════ WAVELENGTH VERİSİ ══════════════ */
+const WAVE_DATA = [
+  { left: "Sıcak", right: "Soğuk" },
+  { left: "İşe Yaramaz", right: "Çok Faydalı" },
+  { left: "Kötü Film", right: "İyi Film" },
+  { left: "Zor İş", right: "Kolay İş" },
+  { left: "Kötü Kokulu", right: "Güzel Kokulu" },
+  { left: "Sıkıcı", right: "Eğlenceli" },
+  { left: "Ucuz", right: "Pahalı" },
+  { left: "Kaba", right: "Kibar" },
+  { left: "Çocukça", right: "Yetişkin İşi" },
+  { left: "Güvenilmez", right: "Güvenilir" },
+  { left: "Çirkin", right: "Güzel" },
+  { left: "Sağlıksız", right: "Sağlıklı" },
+  { left: "Tehlikeli", right: "Güvenli" },
+  { left: "Zayıf", right: "Güçlü" },
+  { left: "Yumuşak", right: "Sert" },
+  { left: "Aptalca", right: "Zekice" },
+  { left: "Kısa Ömürlü", right: "Uzun Ömürlü" },
+  { left: "Modası Geçmiş", right: "Moda/Trend" },
+  { left: "Gereksiz İcat", right: "Harika İcat" },
+  { left: "Kötü Süper Güç", right: "İyi Süper Güç" },
+  { left: "İğrenç Yemek", right: "Lezzetli Yemek" },
+  { left: "Çok Yorucu", right: "Çok Dinlendirici" },
+  { left: "Gereksiz", right: "Temel İhtiyaç" },
+  { left: "Affedilemez", right: "Affedilebilir" },
+  { left: "Acı Verici", right: "Keyif Verici" }
+];
+
+/* ══════════════ TABU KATEGORİLERİ ══════════════ */
+const TABU_CATEGORIES = {
+  genel: [
+    {word:"Elma",forbidden:["Meyve","Kırmızı","Ağaç","Isırmak","Amasya"]},
+    {word:"Köpek",forbidden:["Hayvan","Havlamak","Evcil","Kemik","Kedi"]},
+    {word:"Kitap",forbidden:["Okumak","Sayfa","Yazar","Kütüphane","Roman"]},
+    {word:"Su",forbidden:["İçmek","Nehir","Sıvı","Yaşam","Bardak"]},
+    {word:"Telefon",forbidden:["Aramak","Ekran","Mesaj","İletişim","Şarj"]},
+    {word:"Tatil",forbidden:["Seyahat","Deniz","Yaz","Otel","Dinlenmek"]},
+    {word:"Bisiklet",forbidden:["Pedal","Tekerlek","Sürmek","Spor","İki"]},
+    {word:"Nostalji",forbidden:["Geçmiş","Hatıra","Özlem","Eski","Duygu"]},
+    {word:"Karantina",forbidden:["Hastalık","Evde","İzolasyon","Pandemi","Kapatmak"]}
+  ],
+  ev: [
+    {word:"Koltuk", forbidden:["Oturmak", "Mobilya", "Salon", "Rahat", "Kanepe"]},
+    {word:"Ütü", forbidden:["Kıyafet", "Kırışık", "Sıcak", "Buhar", "Masası"]},
+    {word:"Süpürge", forbidden:["Toz", "Temizlik", "Çekmek", "Elektrik", "Makine"]},
+    {word:"Buzdolabı", forbidden:["Soğuk", "Yemek", "Mutfak", "Buz", "Saklamak"]},
+    {word:"Televizyon", forbidden:["İzlemek", "Kumanda", "Ekran", "Kanal", "Dizi"]},
+    {word:"Halı", forbidden:["Yer", "Kilim", "Sermek", "Yıkamak", "Tüylü"]},
+    {word:"Perde", forbidden:["Pencere", "Kapatmak", "Güneş", "Kumaş", "Tül"]},
+    {word:"Fırın", forbidden:["Yemek", "Pişirmek", "Kek", "Sıcak", "Mutfak"]},
+    {word:"Çamaşır Makinesi", forbidden:["Kıyafet", "Yıkamak", "Kirli", "Deterjan", "Su"]}
+  ],
+  spor: [
+    {word:"Ofsayt", forbidden:["Futbol", "Hakem", "Kural", "Çizgi", "Pas"]},
+    {word:"Penaltı", forbidden:["Gol", "Ceza Sahası", "Vuruş", "Kaleci", "Nokta"]},
+    {word:"Krampon", forbidden:["Ayakkabı", "Çivi", "Futbolcu", "Saha", "Giyinmek"]},
+    {word:"Basketbol", forbidden:["Pota", "Top", "Zıplamak", "Smaç", "Uzun"]},
+    {word:"Hakem", forbidden:["Düdük", "Maç", "Kırmızı Kart", "Yönetmek", "Karar"]},
+    {word:"File", forbidden:["Voleybol", "Tenis", "Ağ", "Ortada", "Top"]},
+    {word:"Stadyum", forbidden:["Seyirci", "Tribün", "Saha", "Büyük", "Maç"]},
+    {word:"Maraton", forbidden:["Koşmak", "Yarış", "42km", "Uzun", "Sporcu"]},
+    {word:"Antrenman", forbidden:["Çalışmak", "İdman", "Spor", "Hazırlık", "Terlemek"]}
+  ],
+  sinema: [
+    {word:"Yönetmen", forbidden:["Film", "Kamera", "Çekmek", "Oyuncu", "Motor"]},
+    {word:"Patlamış Mısır", forbidden:["Sinema", "Yemek", "Tuzlu", "İzlemek", "Mısır"]},
+    {word:"Oscar", forbidden:["Ödül", "Film", "Tören", "Heykel", "Akademi"]},
+    {word:"Korku Filmi", forbidden:["Korkmak", "Çığlık", "Hayalet", "Gerilim", "Karanlık"]},
+    {word:"Aktör", forbidden:["Rol", "Oynamak", "Film", "Sinema", "Ünlü"]},
+    {word:"Sahne", forbidden:["Oyun", "Tiyatro", "Çekim", "Film", "Bölüm"]},
+    {word:"Dublör", forbidden:["Tehlikeli", "Oyuncu", "Yerine", "Sahne", "Atlamak"]},
+    {word:"Gişe", forbidden:["Bilet", "Satmak", "Sinema", "Para", "Rekor"]},
+    {word:"Kamera", forbidden:["Çekmek", "Kayıt", "Video", "Film", "Lens"]}
+  ]
+};
+
+/* ══════════════ QUIZ VERİSİ ══════════════ */
+const QUIZ_DATA = [
+  {
+    id:'bb', name:'Breaking Bad', emoji:'🧪',
+    color:'linear-gradient(135deg,#16a34a,#065f46)',
+    shadow:'rgba(22,163,74,.4)',
+    questions:[
+      { q:"Salamanca ailesinden olmayan kimdir?", choices:["Tuco","Lalo","Hector","Gus"], answer:3, explain:"Gus Fring, Salamanca ailesiyle düşman — Cartel içindeki rakibi." },
+      { q:"Walter White'ın kimyasal kod adı nedir?", choices:["Heisenberg","Eisenberg","Bluestone","Chemist"], answer:0, explain:"Walter kendine 'Heisenberg' adını seçti — fizikçi Werner Heisenberg'den." },
+      { q:"Jesse Pinkman'ın slang kelimesi hangisidir?", choices:["Dude","Bitch","Man","Yo"], answer:1, explain:"Jesse'nin 'Yeah bitch!' repliği dizinin ikonik anlarından." },
+      { q:"Walter White hangi okulda kimya öğretmeniydi?", choices:["J.P. Wynne","Albuquerque High","Desert Sky","Rio Rancho"], answer:0, explain:"Walter, J.P. Wynne Lisesi'nde kimya öğretmeniydi." },
+      { q:"Saul Goodman'ın gerçek adı nedir?", choices:["Jimmy McGill","Jimmy Smith","Bob Odenkirk","James Goodman"], answer:0, explain:"Saul Goodman, 's'all good, man' kelime oyunuyla James 'Jimmy' McGill'in seçtiği isim." },
+      { q:"Blue Sky metanın saflık oranı nedir?", choices:["%96","%98","%99.1","%100"], answer:2, explain:"Walt ve Jesse'nin meth'i %99.1 saflığıyla Albuquerque'de eşsizdi." },
+      { q:"Hank Schrader'in mesleği nedir?", choices:["Polis","Dedektif","DEA Ajanı","FBI Ajanı"], answer:2, explain:"Hank, Walter'ın kayınbiraderi ve DEA ajanıydı." },
+      { q:"Mike Ehrmantraut daha önce nerede çalışıyordu?", choices:["Ordu","FBI","Philadelphia Polisi","CIA"], answer:2, explain:"Mike, Philadelphia Polisi'nden ayrılmadan önce orada çalışıyordu." },
+      { q:"Gus Fring'in işletmesi nedir?", choices:["Los Pollos Hermanos","Taco Bell","Cartel Chicken","El Pollo"], answer:0, explain:"'Los Pollos Hermanos' (Kardeşler Tavuk) Gus'ın uyuşturucu için örtü işiydi." },
+      { q:"Walter White'ın kanseri nerede başladı?", choices:["Karaciğer","Böbrek","Akciğer","Beyin"], answer:2, explain:"Walter'a akciğer kanseri teşhisi konuldu — bu dizi olaylarını tetikledi." },
+      { q:"Todd'un soyadı nedir?", choices:["Alquist","Brennan","Lyons","White"], answer:0, explain:"Todd Alquist, Walt ve Jesse için çalışan soğukkanlı bir suç ortağıydı." },
+      { q:"Brock'u kim zehirledi?", choices:["Jesse","Walter","Gus","Todd"], answer:1, explain:"Walter, Jesse'yi manipüle etmek için Brock'u Lily of the Valley ile zehirledi." },
+    ]
+  },
+  {
+    id:'himym', name:'How I Met Your Mother', emoji:'🍺',
+    color:'linear-gradient(135deg,#f59e0b,#b45309)',
+    shadow:'rgba(245,158,11,.4)',
+    questions:[
+      { q:"Ted Mosby'nin çocuklarına anlattığı hikaye hangi şehirde geçer?", choices:["Chicago","New York","Boston","Los Angeles"], answer:1, explain:"Tüm hikaye New York'ta, özellikle Manhattan'da geçiyor." },
+      { q:"Barney Stinson'ın meşhur sözü hangisidir?", choices:["Suit up!","Legend... wait for it","How you doin'?","Have you met Ted?"], answer:0, explain:"'Suit up!' Barney'nin ikonik repliği — her zaman takım elbisesiyle dolaşırdı." },
+      { q:"The Mother'ın gerçek adı nedir?", choices:["Victoria","Stella","Tracy","Robin"], answer:2, explain:"The Mother'ın adı Tracy McConnell olarak son sezonda ortaya çıktı." },
+      { q:"Marshall ve Lily hangi eyaletten?", choices:["New York","Minnesota","New Jersey","Ohio"], answer:1, explain:"Marshall ve Lily Minnesota'dan — özellikle St. Cloud'dan." },
+      { q:"Grubun takıldığı bar nedir?", choices:["Central Perk","MacLaren's","Paddy's Pub","The Anchor"], answer:1, explain:"MacLaren's Pub, grubun ikonik buluşma noktasıydı." },
+      { q:"Barney'nin 'Bro Code'unda kaç madde var?", choices:["50","100","150","200"], answer:1, explain:"The Bro Code, 100 maddeyi kapsıyor — Barney tarafından yazıldı iddiasıyla." },
+      { q:"Ted hangi alanda profesör?", choices:["Hukuk","Mimarlık","Mühendislik","Ekonomi"], answer:1, explain:"Ted Mosby bir mimarlık profesörü ve aynı zamanda mimar." },
+      { q:"Robin Scherbatsky hangi ülkeden?", choices:["ABD","İngiltere","Avustralya","Kanada"], answer:3, explain:"Robin Kanada'dan — 'Robin Sparkles' adıyla pop şarkıcısı geçmişi de var." },
+      { q:"Barney'nin sıklıkla bahsettiği playbook ne?", choices:["Bro Code","The Playbook","Legen Book","Suit Manual"], answer:1, explain:"The Playbook, Barney'nin kadınları etkilemek için kullandığı stratejiler kitabı." },
+      { q:"Lily hangi sanat dalında eğitim gördü?", choices:["Müzik","Dans","Resim/Sanat","Tiyatro"], answer:2, explain:"Lily, San Francisco'da sanat okumak istedi — bu Marshall ile ilk büyük krizlerini yarattı." },
+      { q:"Marshall'ın babası ne iş yapar?", choices:["Avukat","Polis","Kamyon şoförü","Bankacı"], answer:2, explain:"Marvin Eriksen Sr., Minnesota'da kamyon şoförüydü." },
+      { q:"Ted'in 'The Yellow Umbrella'yı bulduğu yer neresi?", choices:["Metro","Tren istasyonu","Barney'nin arabası","MacLaren's"], answer:1, explain:"Sarı şemsiye Tracy ile buluşmanın sembolü — tren istasyonunda karşılaştılar." },
+    ]
+  },
+  {
+    id:'got', name:'Game of Thrones', emoji:'🐉',
+    color:'linear-gradient(135deg,#6b7280,#1f2937)',
+    shadow:'rgba(107,114,128,.4)',
+    questions:[
+      { q:"'Winter is Coming' sözü hangi evin mottosu?", choices:["Lannister","Stark","Targaryen","Baratheon"], answer:1, explain:"'Winter is Coming' — House Stark'ın motto'su, Kuzey'in soğuk gerçekliğini simgeler." },
+      { q:"Arya Stark'ın 'No One' olma eğitimini aldığı örgüt?", choices:["Night's Watch","Faceless Men","Brotherhood","Maesters"], answer:1, explain:"Arya, Braavos'ta 'Faceless Men' (Yüzsüzler) örgütünde eğitim aldı." },
+      { q:"Khal Drogo hangi halkın lideri?", choices:["Unsullied","Dothraki","Wildlings","Sand Snakes"], answer:1, explain:"Khal Drogo, Dothraki'nin lideri — Daenerys ile evlendi." },
+      { q:"Tyrion Lannister kimse öldürdü (crossbow ile)?", choices:["Joffrey","Cersei","Tywin","Shae"], answer:2, explain:"Tyrion, Tywin Lannister'ı tuvalet üzerinde crossbow ile öldürdü." },
+      { q:"'The Red Wedding'de öldürülmeyen kim?", choices:["Robb Stark","Catelyn Stark","Talisa","Sansa Stark"], answer:3, explain:"Sansa, Kuzey'de değil King's Landing'deydi — katliam kurbanları arasında değildi." },
+      { q:"Jon Snow'u hayata döndüren kim?", choices:["Bran","Daenerys","Melisandre","Arya"], answer:2, explain:"Melisandre, Jon Snow'a R'hllor adına 'breath of life' büyüsü uyguladı." },
+      { q:"Valyrian çeliğiyle yapılmış kılıç 'Needle' kime ait?", choices:["Sansa","Brienne","Arya","Cersei"], answer:2, explain:"Needle, Jon Snow'un Arya'ya hediye ettiği ince kılıç." },
+      { q:"'A Lannister always pays his debts' söyleminin Lannister mottosuyla ilgisi?", choices:["Aynı şey","Motto değil, söylem","Motto bu","Yasal zorunluluk"], answer:1, explain:"Gerçek Lannister mottosu 'Hear Me Roar' — borç ödeme sadece popüler bir söylem." },
+      { q:"Night King'i öldüren kim?", choices:["Jon Snow","Daenerys","Bran","Arya"], answer:3, explain:"Arya Stark, Valyrian çeliği Catspaw ile Night King'i öldürdü." },
+      { q:"Hodor'un adının anlamı ne?", choices:["Güçlü","Hold the door","Kuzey'in oğlu","Dost"], answer:1, explain:"Hodor'un adı 'Hold the door' komutunun zamanla bozulmasından oluştu — trajik bir loop." },
+      { q:"Daenerys'in ejderhalarından siyah olanın adı?", choices:["Rhaegal","Viserion","Drogon","Balerion"], answer:2, explain:"Drogon, Daenerys'in en büyük ve en güçlü ejderhası — Khal Drogo'ya ithafen." },
+      { q:"Cersei'nin annesi kimdir?", choices:["Olenna Tyrell","Joanna Lannister","Lysa Arryn","Genna Lannister"], answer:1, explain:"Joanna Lannister, Cersei ve Jaime'nin annesi — Tyrion'u doğururken hayatını kaybetti." },
+    ]
+  },
+  {
+    id:'stranger', name:'Stranger Things', emoji:'🔦',
+    color:'linear-gradient(135deg,#dc2626,#7f1d1d)',
+    shadow:'rgba(220,38,38,.4)',
+    questions:[
+      { q:"Eleven'ın gerçek adı nedir?", choices:["Jane","Elle","Sara","Nina"], answer:0, explain:"Eleven'ın doğum adı Jane Hopper — Jim Hopper tarafından evlat edinildi." },
+      { q:"The Upside Down'ın Türkçe karşılığı ne?", choices:["Karanlık Boyut","Ters Yüz","Alt Dünya","Gölge Alem"], answer:1, explain:"The Upside Down — dizinin Türkçe adında 'Ters Yüz' olarak çevrildi." },
+      { q:"Will Byers'ı kaçıran varlık nedir?", choices:["Mind Flayer","Demogorgon","Vecna","Demodogs"], answer:1, explain:"Will'i Upside Down'a çeken Demogorgon'du — 1. sezonda." },
+      { q:"Hawkins Lab hangi devlet kurumuna bağlı?", choices:["FBI","CIA","DOE (Enerji Bakanlığı)","NSA"], answer:2, explain:"Hawkins Ulusal Laboratuvarı, ABD Enerji Bakanlığı'na (DOE) bağlıydı." },
+      { q:"Dustin'in Upside Down'dan kaçırdığı yaratık?", choices:["D'Artagnan","Dart","Flea","Sludge"], answer:1, explain:"Dart (D'Artagnan kısaltması), Dustin'in evde beslediği Demodog yavrusuydu." },
+      { q:"4. sezonda ana kötü 'Vecna'nın insan hali kim?", choices:["Billy","Dr. Brenner","Henry Creel / 001","Dr. Owens"], answer:2, explain:"Vecna, Henry Creel — Brenner'ın ilk deneyi, 001 numaralı özne." },
+      { q:"Hopper'ın öldüğü sanılan bölüm hangisi?", choices:["S2 Final","S3 Final","S4 Başı","S1 Final"], answer:1, explain:"Hopper, 3. sezon finalinde kapının patlamasında kayboldu — aslında Rusya'ya kaçmıştı." },
+      { q:"Steve Harrington'ın silahı nedir?", choices:["Ateşli silah","Demir çubuk","Çivili beyzbol sopası","Balta"], answer:2, explain:"Steve'in ikonik silahı çivilerle donatılmış beyzbol sopasıdır." },
+      { q:"Eleven'ın güçlerini geri kazanmasına yardım eden kim?", choices:["Mike","Hopper","Dr. Brenner","Joyce"], answer:2, explain:"Dr. Brenner (Papa), 4. sezonda Eleven'ın güçlerini yeniden aktive etti." },
+      { q:"Scoops Ahoy hangi alışveriş merkezinde?", choices:["Starcourt Mall","Hawkins Mall","Rainbow Mall","Melnikoff's"], answer:0, explain:"Scoops Ahoy, Steve ve Robin'in çalıştığı Starcourt Mall'daki dondurma dükkanı." },
+    ]
+  },
+  {
+    id:'friends', name:'Friends', emoji:'☕',
+    color:'linear-gradient(135deg,#f97316,#c2410c)',
+    shadow:'rgba(249,115,22,.4)',
+    questions:[
+      { q:"Ross Geller hangi alanda doktora yaptı?", choices:["Biyoloji","Paleontoloji","Arkeoloji","Jeoloji"], answer:1, explain:"Ross, paleontoloji doktorası aldı ve müzede çalıştı — dinozorlar onun tutkusuydu." },
+      { q:"Monica'nın apartman numarası kaç?", choices:["19","20","3B","5A"], answer:1, explain:"Monica ve Rachel'ın ünlü dairesi 20 numaraydı — karşı taraftaki ise 19." },
+      { q:"Joey Tribbiani'nin meşhur sorusu?", choices:["How you doin'?","Could this BE any more?","We were on a break!","I know!"], answer:0, explain:"Joey'nin 'How you doin'?' deyişi dizinin en ikonik replikleri arasında." },
+      { q:"Chandler'ın işi tam olarak nedir?", choices:["Muhasebe","Statistical analysis and data reconfiguration","IT","Yazılım"], answer:1, explain:"Chandler'ın işi o kadar anlaşılmazdı ki arkadaşları bile tam olarak ne yaptığını bilmiyordu." },
+      { q:"'We were on a break!' söylemini kim söylüyor?", choices:["Chandler","Joey","Ross","Monica"], answer:2, explain:"Ross'un 'We were on a break!' çığlığı, Rachel ile tartışmalarının merkeziydi." },
+      { q:"Smelly Cat şarkısını kim söylüyor?", choices:["Rachel","Monica","Phoebe","All"], answer:2, explain:"Smelly Cat, Phoebe Buffay'ın Central Perk'te seslendirdiği ikonik şarkısı." },
+      { q:"Gunther'ın gerçek soyadı nedir?", choices:["Central","Geller","Smith","Central'ın soyadı yok"], answer:3, explain:"Gunther'ın soyadı dizide hiç geçmedi — sadece Gunther olarak kaldı." },
+      { q:"Marcel kimdir?", choices:["Joey'nin köpeği","Ross'un maymunu","Chandler'ın balığı","Phoebe'nin kedisi"], answer:1, explain:"Marcel, Ross'un sevdiği capuchin maymunuydu — daha sonra müzede yaşamaya gönderildi." },
+      { q:"Rachel'ın ilk işi neydi?", choices:["Moda tasarımcısı","Mağaza çalışanı","Garson","Manken"], answer:2, explain:"Rachel, bağımsız olmaya karar verip Central Perk'te garsonluk yaptı." },
+      { q:"'I'll be there for you' şarkısını söyleyen grup?", choices:["Boyz II Men","The Rembrandts","R.E.M.","Hootie"], answer:1, explain:"The Rembrandts, 'I'll Be There for You' şarkısını Friends için seslendirdi." },
+    ]
+  },
+  {
+    id:'peaky', name:'Peaky Blinders', emoji:'🎩',
+    color:'linear-gradient(135deg,#1e40af,#1e3a8a)',
+    shadow:'rgba(30,64,175,.4)',
+    questions:[
+      { q:"Peaky Blinders adı nereden geliyor?", choices:["Kurucunun lakabı","Kasket siperlerine dikilen jilet","Soygun yöntemi","Bir semtten"], answer:1, explain:"Peaky Blinders, kasketlerinin siperlerine dikilen jiletleri kullanarak düşmanlarını kör ediyordu." },
+      { q:"Tommy Shelby hangi savaşa katıldı?", choices:["Kore Savaşı","II. Dünya Savaşı","I. Dünya Savaşı","Falkland"], answer:2, explain:"Tommy ve kardeşleri, Birinci Dünya Savaşı'nda Fransa'da savaştı — tünel kazan birlik." },
+      { q:"Grace Burgess gerçekte ne iş yapıyordu?", choices:["Barmen","İngiliz İstihbaratı Ajan","Hırsız","Gazeteci"], answer:1, explain:"Grace, Tommy'yi casusluk için yaklaşan bir İngiliz istihbarat ajanıydıydı." },
+      { q:"Polly Gray Tommy ile ne akraba?", choices:["Annesi","Kız kardeşi","Teyzesi","Büyükannesi"], answer:2, explain:"Polly Gray (Pol), Shelby kardeşlerin teyzesi ve Shelby Company'nin finansal beyni." },
+      { q:"Alfie Solomons hangi dini gruba mensup?", choices:["Katolik","Yahudi","Protestan","İrlandalı"], answer:1, explain:"Alfie Solomons, Yahudi Camden kasabası suç örgütünün lideriydi." },
+      { q:"Tommy Shelby'nin at yarışı işyerinin adı?", choices:["Shelby Racing","Garrison Bookmakers","Shelby Company Limited","The Blinders"], answer:2, explain:"Shelby Company Limited, Peaky Blinders'ın yasal çatısı altında kurduğu iş imparatorluğu." },
+      { q:"Dizinin geçtiği şehir hangisi?", choices:["Manchester","London","Birmingham","Leeds"], answer:2, explain:"Peaky Blinders, Birmingham'ın Small Heath semtinde geçiyor." },
+      { q:"Michael Gray kim?", choices:["Tommy'nin oğlu","Polly'nin oğlu","Arthur'un oğlu","Ada'nın oğlu"], answer:1, explain:"Michael Gray, Polly'nin öz oğlu — Shelby ailesine sonradan katıldı." },
+      { q:"Inspector Campbell hangi ülkeden?", choices:["İngiltere","Galler","İrlanda","İskoçya"], answer:3, explain:"Chester Campbell, İskoç asıllı bir dedektif başmüfettişiydi." },
+      { q:"Luca Changretta hangi mafya ailesini temsil ediyor?", choices:["Sicilya","New York","Chicago","Miami"], answer:1, explain:"Luca Changretta, New York'taki İtalyan Amerikan mafyasından — babası Birmingham'da öldürülmüştü." },
+    ]
+  },
+  {
+    id:'office', name:'The Office', emoji:'📎',
+    color:'linear-gradient(135deg,#6366f1,#4338ca)',
+    shadow:'rgba(99,102,241,.4)',
+    questions:[
+      { q:"The Office hangi şehirde geçiyor?", choices:["New York","Philadelphia","Scranton","Pittsburgh"], answer:2, explain:"Dunder Mifflin'in Scranton, Pennsylvania şubesi — Michael Scott'ın imparatorluğu." },
+      { q:"Dwight Schrute'un çiftliğinde ne yetiştiriyor?", choices:["Pancar","Domates","Buğday","Mısır"], answer:0, explain:"Dwight'ın Schrute Farms'ında pancar (beet) yetiştirir — 'Fact: Bears eat beets.'" },
+      { q:"Jim Halpert'in sevgilisi/eşi kim?", choices:["Kelly","Angela","Pam","Karen"], answer:2, explain:"Jim ve Pam'ın aşk hikayesi dizinin duygusal çekirdeğiydi." },
+      { q:"Michael Scott'ın kurduğu rakip şirket?", choices:["Scott's Tots","Michael Scott Paper Co.","Dunder Scott","Paper Monsters"], answer:1, explain:"Michael, Dunder Mifflin'den ayrılıp kısa süreliğine Michael Scott Paper Company'yi kurdu." },
+      { q:"Kevin Malone'un meşhur yemeği?", choices:["Kevin's Famous Pasta","Kevin's Famous Chili","Kevin's Famous Cookies","Kevin's Famous Stew"], answer:1, explain:"Kevin'in Famous Chili'si — dökme sahnesiyle ölümsüzleşti." },
+      { q:"'That's what she said' repliği kime ait?", choices:["Dwight","Jim","Ryan","Michael"], answer:3, explain:"Michael Scott'ın 'That's what she said' repliği dizinin en ikonik esprisiydi." },
+      { q:"Ryan Howard'ın unvanı nasıl değişti (ilk sezondan itibaren)?", choices:["Temp→Satış→CEO","Temp→Satış→VP→Temp","Satış→Müdür","VP→CEO"], answer:1, explain:"Ryan, stajyerden VP'ye yükseldi, hapse girdi ve sonunda tekrar stajyere döndü." },
+      { q:"Andy Bernard hangi üniversiteye gitti?", choices:["Harvard","Yale","Cornell","Princeton"], answer:2, explain:"Andy, Cornell mezunu olduğunu her fırsatta söylüyordu — Cornell şarkısını da söylerdi." },
+      { q:"Phyllis'in soyadı ve kocasının adı?", choices:["Phyllis Vance - Bob Vance","Phyllis Smith - Dave","Phyllis Brown - Jim","Phyllis Vance - Michael"], answer:0, explain:"Phyllis Vance, Bob Vance (Vance Refrigeration) ile evliydi — unvan takıntısı meşhurdu." },
+      { q:"Dunder Mifflin sonunda hangi şirket tarafından satın alındı?", choices:["Staples","Sabre","Office Max","Amazon"], answer:1, explain:"Dunder Mifflin, Sabre Corporation tarafından satın alındı — CEO Jo Bennett ile yeni dönem başladı." },
+    ]
+  },
+  {
+    id:'black', name:'Black Mirror', emoji:'📱',
+    color:'linear-gradient(135deg,#111827,#374151)',
+    shadow:'rgba(55,65,81,.5)',
+    questions:[
+      { q:"'The National Anthem' bölümünde başbakandan ne isteniyor?", choices:["Fidye ödemesi","Domuzla ilişki","Ülkeyi terk","İstifa"], answer:1, explain:"Başbakan, prensesi kurtarmak için canlı yayında domuzla ilişkiye girmek zorunda bırakıldı." },
+      { q:"'San Junipero'da insanlar ne yapıyor?", choices:["Sanal gerçeklikte yaşıyor","Bilinçlerini yükleyip yaşıyor","Geçmişe gidiyor","Ölümsüz oluyor"], answer:1, explain:"San Junipero, ölmekte olan veya ölmüş insanların bilinçlerini yükleyebildiği bir bulut sistemi." },
+      { q:"'Nosedive' bölümünde hayat neye göre şekilleniyor?", choices:["Para","Sosyal medya puanı","Meslek","Yaş"], answer:1, explain:"Nosedive'da herkes herkesi 1-5 arası puanlıyor; puanın düşmesi hayatı mahvedebilir." },
+      { q:"'Metalhead' bölümünde tehdit ne?", choices:["Zombiler","Robot köpekler","Yapay zeka","Drone'lar"], answer:1, explain:"Metalhead, insanları avlayan otonom robot köpekler hakkında — siyah-beyaz çekildi." },
+      { q:"'Hated in the Nation' bölümündeki ölüm silahı?", choices:["Drone'lar","Arılar","Sinekler","Robotlar"], answer:1, explain:"Yapay arı drone'ları, #DeathTo hashtag oylama sistemiyle hedeflere saldırıyordu." },
+      { q:"'White Bear' bölümünde kadın neden cezalandırılıyor?", choices:["Cinayet","Çocuk işkencesini izleyip paylaşmak","Hırsızlık","Terör"], answer:1, explain:"Victoria, nişanlısının bir çocuğu öldürmesini izleyip kaydetmişti — günde defalarca ceza görüyordu." },
+      { q:"'USS Callister' bölümünde yaratıcı ne yapıyor?", choices:["Gerçek uzayda seyahat","DNA kopyalarını sanal oyunda köle ediyor","Yapay zeka köleler","Simülasyon inşa ediyor"], answer:1, explain:"Daly, çalışanlarının DNA'sından dijital kopyalar yaratıp Star Trek temalı oyununda köle olarak kullanıyordu." },
+      { q:"'Be Right Back' bölümünde ölmüş sevgilinin yerine ne geliyor?", choices:["Hologram","Klon","Yapay zeka chatbot → robot beden","Anı kaydı"], answer:2, explain:"Martha, Ash'in sosyal medya verilerinden eğitilen bir yapay zekaya, sonra fiziksel bir robota sahip oldu." },
+      { q:"'Fifteen Million Merits' bölümünde insanlar ne yapıyor?", choices:["Savaşıyor","Pedal çeviriyor","Madencilik","Tarım"], answer:1, explain:"İnsanlar enerji üretmek için pedal çeviriyor ve sanal gerçeklik içinde yaşıyor." },
+      { q:"'Crocodile' bölümünde hafıza makinesi ne işe yarıyor?", choices:["Hafıza silme","Geçmiş olayları görselleştirme","Hafıza aktarma","Rüya kaydı"], answer:1, explain:"Recaller cihazı, anıları görüntüye dönüştürüyor — sigorta soruşturmaları için kullanılıyor." },
+    ]
+  },
+];
+
+/* ══════════════ KİM BU VERİSİ ══════════════ */
+const KB_DATA = {
+  futbolcu: [
+    { name:"Lionel Messi", clues:["FC Barcelona (1995-2021)","Paris Saint-Germain","Inter Miami (2023-)","Arjantin Milli Takımı","2022 Dünya Kupası Şampiyonu"] },
+    { name:"Cristiano Ronaldo", clues:["Sporting CP","Manchester United","Real Madrid (2009-2018)","Juventus","Al Nassr (2023-)"] },
+    { name:"Kylian Mbappé", clues:["AS Monaco","Paris Saint-Germain","Real Madrid (2024-)","Fransa Milli Takımı","2018 Dünya Kupası Şampiyonu"] },
+    { name:"Erling Haaland", clues:["Molde FK","RB Salzburg","Borussia Dortmund","Manchester City (2022-)","Norveç Milli Takımı"] },
+    { name:"Neymar Jr", clues:["Santos FC","FC Barcelona","Paris Saint-Germain","Al Hilal","Brezilya Milli Takımı"] },
+    { name:"Luka Modric", clues:["Dinamo Zagreb","Tottenham Hotspur","Real Madrid (2012-)","Hırvatistan Milli Takımı","2018 Altın Top Sahibi"] },
+    { name:"Virgil van Dijk", clues:["Celtic","Southampton","Liverpool (2018-)","Hollanda Milli Takımı","2019 Şampiyonlar Ligi"] },
+    { name:"Kevin De Bruyne", clues:["Chelsea","VfL Wolfsburg","Manchester City (2015-)","Belçika Milli Takımı","Premier Lig asist rekoru"] },
+    { name:"Mohamed Salah", clues:["Basel","Chelsea","AS Roma","Liverpool (2017-)","Mısır Milli Takımı"] },
+    { name:"Vinicius Jr", clues:["Flamengo","Real Madrid (2018-)","Brezilya Milli Takımı","2022 Şampiyonlar Ligi Finali Golü","UEFA 2024 Oyuncusu"] },
+    { name:"Pedri", clues:["Las Palmas","FC Barcelona (2020-)","İspanya Milli Takımı","2021 UEFA Golden Boy","2024 Avrupa Şampiyonu"] },
+    { name:"Rodri", clues:["Villarreal","Atletico Madrid","Manchester City (2019-)","İspanya Milli Takımı","2024 Ballon d'Or"] },
+    { name:"Jude Bellingham", clues:["Birmingham City","Borussia Dortmund","Real Madrid (2023-)","İngiltere Milli Takımı","2023 UEFA Genç Oyuncusu"] },
+    { name:"Harry Kane", clues:["Tottenham Hotspur","Bayern Münih (2023-)","İngiltere Milli Takımı","Premier Lig gol rekoru","Leyton Orient (kiralık)"] },
+    { name:"Zlatan Ibrahimovic", clues:["Ajax","Juventus","Inter Milan","AC Milan","Paris Saint-Germain"] },
+    { name:"Ronaldinho", clues:["Gremio","Paris Saint-Germain","FC Barcelona","AC Milan","2005 Altın Top Sahibi"] },
+    { name:"Zinedine Zidane", clues:["Bordeaux","Juventus","Real Madrid","Fransa Milli Takımı","1998 Dünya Kupası Şampiyonu"] },
+    { name:"Thierry Henry", clues:["AS Monaco","Juventus","Arsenal","FC Barcelona","Fransa Milli Takımı"] },
+    { name:"Karim Benzema", clues:["Olympique Lyon","Real Madrid (2009-2023)","Al Ittihad","Fransa Milli Takımı","2022 Altın Top Sahibi"] },
+    { name:"Robert Lewandowski", clues:["Lech Poznan","Borussia Dortmund","Bayern Münih","FC Barcelona (2022-)","Polonya Milli Takımı"] },
+    { name:"Toni Kroos", clues:["Bayern Münih","Real Madrid (2014-2024)","Almanya Milli Takımı","4 Şampiyonlar Ligi","2014 Dünya Kupası"] },
+    { name:"Sergio Ramos", clues:["Sevilla","Real Madrid","Paris Saint-Germain","İspanya Milli Takımı","2010 Dünya Kupası"] },
+    { name:"Manuel Neuer", clues:["Schalke 04","Bayern Münih","Almanya Milli Takımı","Süpermen kaleci","2014 Dünya Kupası"] },
+    { name:"Antoine Griezmann", clues:["Real Sociedad","Atletico Madrid","FC Barcelona","Fransa Milli Takımı","2018 Dünya Kupası"] },
+    { name:"Paulo Dybala", clues:["Instituto","Palermo","Juventus","AS Roma (2022-)","Arjantin Milli Takımı"] },
+    { name:"Sadio Mane", clues:["Southampton","Liverpool","Bayern Münih","Al Nassr","Senegal Milli Takımı"] },
+    { name:"Bukayo Saka", clues:["Arsenal (2018-)","İngiltere Milli Takımı","EURO 2020 Finalist","Premier Lig yıldızı","Arsenalın 7 numarası"] },
+    { name:"Phil Foden", clues:["Manchester City (2017-)","İngiltere Milli Takımı","Premier Lig Şampiyonu","Stockport doğumlu","Genç yıldız"] },
+    { name:"Son Heung-min", clues:["Hamburg","Bayer Leverkusen","Tottenham (2015-)","Güney Kore Milli Takımı","Premier Lig Gol Krallığı"] },
+    { name:"Joshua Kimmich", clues:["RB Leipzig","Bayern Münih (2015-)","Almanya Milli Takımı","Orta saha dehası","Şampiyonlar Ligi şampiyonu"] },
+    { name:"Gavi", clues:["FC Barcelona (2021-)","İspanya Milli Takımı","2022 Golden Boy","2024 Avrupa Şampiyonu","La Masia ürünü"] },
+    { name:"Florian Wirtz", clues:["Bayer Leverkusen","Almanya Milli Takımı","2024 Bundesliga şampiyonu","Genç orta saha","Avrupa'nın en isteği yeteneği"] },
+    { name:"Lamine Yamal", clues:["FC Barcelona (2023-)","İspanya Milli Takımı","2024 Avrupa Şampiyonu","EURO 2024'ün en genç golcüsü","17 yaşında dünya yıldızı"] },
+    { name:"Rafael Leao", clues:["Sporting CP","Lille","AC Milan (2019-)","Portekiz Milli Takımı","Serie A'nın hız canavarı"] },
+    { name:"Marcus Rashford", clues:["Manchester United (2016-)","İngiltere Milli Takımı","Sosyal aktivizm","Genç forvet","2021 EURO finalist"] },
+    { name:"Romelu Lukaku", clues:["Anderlecht","Chelsea","Manchester United","Inter Milan","Belçika Milli Takımı"] },
+    { name:"Bernardo Silva", clues:["Benfica","AS Monaco","Manchester City (2017-)","Portekiz Milli Takımı","Şampiyonlar Ligi şampiyonu"] },
+    { name:"Achraf Hakimi", clues:["Real Madrid","Borussia Dortmund","Inter Milan","Paris Saint-Germain","Fas Milli Takımı"] },
+    { name:"Victor Osimhen", clues:["Lille","Napoli","Galatasaray (kiralık)","Nijerya Milli Takımı","Serie A Gol Krallığı 2023"] },
+    { name:"Kai Havertz", clues:["Bayer Leverkusen","Chelsea","Arsenal (2023-)","Almanya Milli Takımı","Çok yönlü oyuncu"] },
+  ],
+  aktor: [
+    { name:"Leonardo DiCaprio", clues:["Titanic (1997)","The Aviator (2004)","The Departed (2006)","Inception (2010)","The Revenant — Oscar (2015)"] },
+    { name:"Meryl Streep", clues:["Kramer vs. Kramer (1979)","Sophie's Choice (1982)","The Devil Wears Prada","The Iron Lady (2011)","3 Oscar ödülü"] },
+    { name:"Tom Hanks", clues:["Forrest Gump (1994)","Cast Away (2000)","The Da Vinci Code","Captain Phillips","Pinocchio (2022)"] },
+    { name:"Brad Pitt", clues:["Fight Club (1999)","Troy (2004)","Mr. & Mrs. Smith","Inglourious Basterds","Once Upon a Time in Hollywood"] },
+    { name:"Scarlett Johansson", clues:["Lost in Translation (2003)","Iron Man 2","Her (2013)","Black Widow (2021)","Marriage Story (2019)"] },
+    { name:"Denzel Washington", clues:["Training Day (2001)","Man on Fire","American Gangster","Fences (2016)","The Equalizer serisi"] },
+    { name:"Cate Blanchett", clues:["The Lord of the Rings","The Aviator (2004)","Blue Jasmine (2013)","Carol (2015)","Tar (2022)"] },
+    { name:"Johnny Depp", clues:["Edward Scissorhands","Pirates of the Caribbean","Charlie and the Chocolate Factory","Sweeney Todd","Fantastic Beasts"] },
+    { name:"Natalie Portman", clues:["Leon: The Professional (1994)","Star Wars Prequel","Black Swan — Oscar (2010)","Thor (2011)","Jackie (2016)"] },
+    { name:"Morgan Freeman", clues:["The Shawshank Redemption","Se7en (1995)","Million Dollar Baby","Batman Begins","Lucy (2014)"] },
+    { name:"Robert Downey Jr", clues:["Chaplin (1992)","Iron Man (2008)","Tropic Thunder","Sherlock Holmes","Avengers: Endgame (2019)"] },
+    { name:"Angelina Jolie", clues:["Girl, Interrupted (1999)","Lara Croft: Tomb Raider","Mr. & Mrs. Smith","Wanted (2008)","Maleficent"] },
+    { name:"Heath Ledger", clues:["10 Things I Hate About You","A Knight's Tale (2001)","Brokeback Mountain","I'm Not There (2007)","The Dark Knight (2008)"] },
+    { name:"Joaquin Phoenix", clues:["Gladiator (2000)","Walk extended Line (2005)","The Master (2012)","Her (2013)","Joker — Oscar (2019)"] },
+    { name:"Anne Hathaway", clues:["The Princess Diaries","The Devil Wears Prada","The Dark Knight Rises","Les Miserables — Oscar","Interstellar (2014)"] },
+    { name:"Will Smith", clues:["Ali (2001)","Hitch (2005)","The Pursuit of Happyness","I Am Legend (2007)","King Richard (2021)"] },
+    { name:"Emma Stone", clues:["Easy A (2010)","The Amazing Spider-Man","Birdman (2014)","La La Land — Oscar","Poor Things (2023)"] },
+    { name:"Christian Bale", clues:["American Psycho (2000)","Batman Begins","The Prestige (2006)","The Fighter (2010)","The Dark Knight"] },
+    { name:"Cillian Murphy", clues:["28 Days Later (2002)","Batman Begins","Inception (2010)","Peaky Blinders (2013-2022)","Oppenheimer — Oscar (2023)"] },
+    { name:"Zendaya", clues:["Shake It Up (2010-2013)","Spider-Man: Homecoming","The Greatest Showman","Euphoria (2019-)","Dune (2021)"] },
+    { name:"Ryan Gosling", clues:["The Notebook (2004)","Blue Valentine (2010)","Drive (2011)","La La Land (2016)","Barbie (2023)"] },
+    { name:"Margot Robbie", clues:["The Wolf of Wall Street","Suicide Squad (2016)","I, Tonya (2017)","Once Upon a Time in Hollywood","Barbie (2023)"] },
+    { name:"Timothee Chalamet", clues:["Call Me By Your Name","Little Women (2019)","Dune (2021)","Wonka (2023)","A Complete Unknown (2024)"] },
+    { name:"Florence Pugh", clues:["Midsommar (2019)","Little Women (2019)","Black Widow (2021)","Don't Worry Darling","Oppenheimer (2023)"] },
+    { name:"Adam Driver", clues:["Star Wars: The Force Awakens","Marriage Story (2019)","BlacKkKlansman","House of Gucci (2021)","Ferrari (2023)"] },
+    { name:"Viola Davis", clues:["Doubt (2008)","The Help (2011)","How to Get Away with Murder","Fences — Oscar (2016)","The Woman King (2022)"] },
+    { name:"Nicole Kidman", clues:["Moulin Rouge! (2001)","The Hours — Oscar","Eyes Wide Shut (1999)","Big Little Lies","Being the Ricardos"] },
+    { name:"Tom Cruise", clues:["Top Gun (1986)","Mission: Impossible serisi","Jerry Maguire (1996)","Minority Report","Top Gun: Maverick (2022)"] },
+    { name:"Idris Elba", clues:["The Wire (2002-2008)","Thor (2011)","Beasts of No Nation","Luther (2010-2019)","The Jungle Book (2016)"] },
+    { name:"Chadwick Boseman", clues:["42 (2013)","Get On Up (2014)","Black Panther (2018)","Avengers: Infinity War","Da 5 Bloods (2020)"] },
+    { name:"Sandra Bullock", clues:["Speed (1994)","Miss Congeniality","Crash (2004)","The Blind Side — Oscar","Gravity (2013)"] },
+    { name:"Daniel Craig", clues:["Layer Cake (2004)","Casino Royale — James Bond (2006)","The Girl with the Dragon Tattoo","Knives Out (2019)","No Time to Die (2021)"] },
+    { name:"Saoirse Ronan", clues:["Atonement (2007)","Brooklyn (2015)","Lady Bird (2017)","Little Women (2019)","4 Oscar adaylığı"] },
+    { name:"Jake Gyllenhaal", clues:["Donnie Darko (2001)","Brokeback Mountain (2005)","Zodiac (2007)","Nightcrawler (2014)","Road House (2024)"] },
+    { name:"Charlize Theron", clues:["Monster — Oscar (2003)","North Country","Mad Max: Fury Road","Atomic Blonde (2017)","Long Shot (2019)"] },
+    { name:"Chris Evans", clues:["Fantastic Four (2005)","Captain America (2011-)","Avengers serisi","Knives Out (2019)","Ghosted (2023)"] },
+    { name:"Robert De Niro", clues:["The Godfather Part II (1974)","Taxi Driver (1976)","Raging Bull — Oscar (1980)","Goodfellas (1990)","Heat (1995)"] },
+    { name:"Al Pacino", clues:["The Godfather serisi","Scarface (1983)","Serpico (1973)","Scent of a Woman — Oscar","Heat (1995)"] },
+    { name:"Natalie Portman", clues:["Leon: The Professional (1994)","Star Wars Prequel","Black Swan — Oscar (2010)","Thor (2011)","Jackie (2016)"] },
+    { name:"Lupita Nyong'o", clues:["12 Years a Slave — Oscar (2013)","Star Wars: The Force Awakens","Black Panther (2018)","Us (2019)","A Quiet Place: Day One (2024)"] },
+    { name:"Pedro Pascal", clues:["Narcos (2015-2016)","Game of Thrones","The Mandalorian (2019-)","The Last of Us (2023)","Gladiator II (2024)"] },
+    { name:"Paul Mescal", clues:["Normal People (2020)","Aftersun (2022)","All of Us Strangers (2023)","Gladiator II (2024)","En küçük Oscar adaylarından"] },
+    { name:"Austin Butler", clues:["Once Upon a Time in Hollywood","Elvis (2022)","Dune: Part Two (2024)","Masters of the Air (2024)","The Bikeriders (2024)"] },
+  ],
+  turk_futbolcu: [
+    { name:"Hakan Calhanoglu", clues:["Trabzonspor","Bayer Leverkusen","AC Milan","Inter Milan (2021-)","Türkiye Milli Takımı Kaptanı"] },
+    { name:"Arda Guler", clues:["Fenerbahce","Real Madrid (2023-)","Türkiye Milli Takımı","EURO 2024 Gol Krallığı","Golden Boy Adayı"] },
+    { name:"Kenan Yildiz", clues:["Bayern Münih Altyapı","Juventus (2023-)","Türkiye Milli Takımı","Serie A yıldızı","Genç yetenek"] },
+    { name:"Merih Demiral", clues:["Fenerbahce","Juventus","Atalanta","Al-Qadsiah","Türkiye Milli Takımı"] },
+    { name:"Zeki Celik", clues:["Fenerbahce","Lille","AS Roma (2022-)","Türkiye Milli Takımı","Sağ Bek"] },
+    { name:"Ferdi Kadioglu", clues:["Fenerbahce","Brighton (2024-)","Türkiye Milli Takımı","Hollanda doğumlu","Premier Lig"] },
+    { name:"Caglar Soyuncu", clues:["Altinordu","Bursaspor","Leicester City","Atletico Madrid","Türkiye Milli Takımı"] },
+    { name:"Burak Yilmaz", clues:["Trabzonspor","Galatasaray","Besiktas","LOSC Lille","Türkiye Milli Takımı Efsanesi"] },
+    { name:"Emre Mor", clues:["Nordsjælland","Borussia Dortmund","Celta Vigo","Galatasaray","Türkiye Milli Takımı"] },
+    { name:"Ozan Kabak", clues:["Galatasaray","VfB Stuttgart","Schalke 04","Liverpool (kiralık)","Türkiye Milli Takımı"] },
+    { name:"Volkan Demirel", clues:["Fenerbahce (uzun yıllar)","Türkiye Milli Takımı","Efsane kaleci","Fenerbahce teknik direktörü","Türk futbol efsanesi"] },
+    { name:"Rustu Recber", clues:["Fenerbahce","Barcelona","Besiktas","2002 Dünya Kupası yarı final","Efsane kaleci"] },
+    { name:"Tuncay Sanli", clues:["Fenerbahce","Middlesbrough","Stoke City","Türkiye Milli Takımı","EURO 2008"] },
+    { name:"Nihat Kahveci", clues:["Besiktas","Real Sociedad","Villarreal","Türkiye Milli Takımı","İspanya'daki başarılı Türk"] },
+    { name:"Ilhan Mansiz", clues:["Besiktas","Vissel Kobe","Türkiye Milli Takımı","2002 Dünya Kupası 3. lük","Japonya'ya gol attı"] },
+    { name:"Hamit Altintop", clues:["Schalke 04","Bayern Münih","Real Madrid","Galatasaray","Türkiye Milli Takımı"] },
+    { name:"Halil Altintop", clues:["Schalke 04","Eintracht Frankfurt","Trabzonspor","Türkiye Milli Takımı","Hamit'in ikiz kardeşi"] },
+    { name:"Yusuf Yazici", clues:["Trabzonspor","LOSC Lille","CSKA Moskova","Türkiye Milli Takımı","Orta saha yaratıcısı"] },
+    { name:"Cenk Tosun", clues:["Besiktas","Everton","Crystal Palace","Türkiye Milli Takımı","Gol makinesi forvet"] },
+    { name:"Abdulkerim Bardakci", clues:["Sivasspor","Galatasaray","Türkiye Milli Takımı","EURO 2024","Genç savunmacı"] },
+    { name:"Baris Alper Yilmaz", clues:["Galatasaray","Türkiye Milli Takımı","EURO 2024","Kanat oyuncusu","Genç yıldız"] },
+    { name:"Okay Yokuslu", clues:["Trabzonspor","Celta Vigo","West Brom","Türkiye Milli Takımı","Defansif orta saha"] },
+    { name:"Dorukhan Tokoz", clues:["Besiktas","Türkiye Milli Takımı","Orta saha","Ligdeki güçlü performans","Genç oyuncu"] },
+    { name:"Orkun Kokcu", clues:["Feyenoord","Benfica (2023-)","Türkiye Milli Takımı","Hollanda'da yetişti","EURO 2024 kadrosu"] },
+    { name:"Altay Bayindir", clues:["Fenerbahce","Manchester United (2023-)","Türkiye Milli Takımı","De Gea'nın halefi","Genç kaleci"] },
+    { name:"Salih Ozcan", clues:["Koln","Borussia Dortmund","Besiktas","Türkiye Milli Takımı","Türk-Alman futbolcu"] },
+    { name:"Irfan Can Kahveci", clues:["Basaksehir","Fenerbahce","Türkiye Milli Takımı","Serbest vuruş uzmanı","Orta saha oyuncusu"] },
+    { name:"Berkan Kutlu", clues:["Konyaspor","Galatasaray","Türkiye Milli Takımı","Orta saha","Şampiyonluk kadrosu"] },
+    { name:"Cengiz Under", clues:["Basaksehir","AS Roma","Leicester City","Marseille","Türkiye Milli Takımı"] },
+    { name:"Hasan Ali Kaldirim", clues:["Fenerbahce","Türkiye Milli Takımı","Sol bek","Uzun kariyer","Milli takım oyuncusu"] },
+  ],
+  turk_aktor: [
+    { name:"Cagatay Ulusoy", clues:["Medcezir (2013)","Delibal (2015)","The Protector — Netflix","Hakan: Muhafız","50m2 dizisi"] },
+    { name:"Kivanc Tatliug", clues:["Gümüş dizisi","Ask-i Memnu","Kurt Seyit ve Sura","Kuzey Guney","Ezel"] },
+    { name:"Halit Ergenc", clues:["Muhteşem Yüzyıl — Kanuni","Bir Istanbul Masalı","Oyle Bir Gecer Zaman Ki","Payitaht Abdülhamid","Filinta"] },
+    { name:"Berguzar Korel", clues:["Binbir Gece","Kacik Romantik","Yabanci Damat","Ezel","Vatanim Sensin"] },
+    { name:"Beren Saat", clues:["Ask-i Memnu","Kacak","Fatih Harbiye","Kahraman dizisi","Türk dizi ikonu"] },
+    { name:"Kenan Imirzialioglu", clues:["Ezel","Karadayi","Cukur","Leke (film)","Türk aksiyon yıldızı"] },
+    { name:"Tuba Buyukustun", clues:["Gonulcelen","Kacak","Medcezir","Fatih Harbiye","Anne dizisi"] },
+    { name:"Mert Firat", clues:["Ezel dizisi","Beni Boyle Sev","Ufak Tefek Cinayetler","Kordugum","Ci filmi"] },
+    { name:"Serenay Sarikaya", clues:["Medcezir dizisi","Hakan: Muhafız","Icerde","Zumrudunka","Kalp Atisi"] },
+    { name:"Engin Altan Duzyatan", clues:["Dirilis: Ertugrul","Muhtesem Yuzyil","Bir Cocuk Sevdim","Kurt Seyit ve Sura","Türk dizi efsanesi"] },
+    { name:"Aras Bulut Iynemli", clues:["Cukur — Yamac Kocovalli","Siyah Beyaz Ask","Sans Oyunlari","Dogu (film)","Netflix Türkiye"] },
+    { name:"Burak Ozcivit", clues:["Kara Sevda","Kurulus: Osman","Calikusu","Filinta","Haniminın Ciftligi"] },
+    { name:"Elcin Sangu", clues:["Fatih Harbiye","Masum","Iyi Gunde Kotu Gunde","Ufak Tefek Cinayetler","Cam Tavanlar"] },
+    { name:"Hazal Kaya", clues:["Ask-i Memnu","Adini Feriha Koydum","Ruzgarli Tepe","Bana Artik Hicran De","Ada Masali"] },
+    { name:"Haluk Bilginer", clues:["Sahsiyet — Emmy odulu","Seref Meselesi","Muhtesem Yuzyil","Ucus 476","Uluslararası kariyer"] },
+    { name:"Gokce Bahadir", clues:["Sahsiyet","Bir Baskadır (Netflix)","Kavak Yelleri","Icerde","Medcezir"] },
+    { name:"Nurgul Yesilcay", clues:["Kacak","Yuksek Sosyete","Ezel","G.O.R.A. filmi","Kayip dizisi"] },
+    { name:"Mehmet Gunsur", clues:["Ezel","Bir Baskadır","Son Yaz","Nehir filmi","Ödüllü oyuncu"] },
+    { name:"Erdal Besikcioglu", clues:["Sahsiyet","Mucize Doktor","Bir Baskadır (Netflix)","Kurtlar Vadisi","Ezel"] },
+    { name:"Ozge Ozpirincci", clues:["Dogdugum Ev Kaderindir","Oyle Bir Gecer Zaman Ki","Bir Aile Hikayesi","Benim Adim Melek","Parca Parca"] },
+    { name:"Taner Olmez", clues:["Mucize Doktor","Adini Feriha Koydum","Icimdeki Firtina","Baraj","Dirilis: Ertugrul"] },
+    { name:"Farah Zeynep Abdullah", clues:["Masum","Cig","Kus Ucusu (Netflix)","Kocan Kadar Konus","Cukur"] },
+    { name:"Necip Memili", clues:["Kurtlar Vadisi","Ezel","Karadayi","Ulan Istanbul","Uzun soluklu kariyer"] },
+    { name:"Nur Fettahoglu", clues:["Binbir Gece","Fatih Harbiye","Ikimizin Sirri","Magnificent Century","Oyuncu ve sunucu"] },
+    { name:"Songul Oden", clues:["Medcezir","Yilanlarin Ocu","Ufak Tefek Cinayetler","Ezel","Sunuculuk kariyeri"] },
+  ]
+};
+
+const DIFF_CONFIG={
+  easy:{forbidden:3, label:'Kolay: Sadece 3 yasak kelime gösterilir'},
+  medium:{forbidden:4, label:'Orta: 4 yasak kelime gösterilir'},
+  hard:{forbidden:5, label:'Zor: 5 yasak kelimenin tümü gösterilir'},
+};
+
+/* ══════════════ STATE ══════════════ */
+let st={
+  players:[],game:'mlto',mode:'vote',qCount:10,
+  questions:[],current:0,scores:{},cardFlipped:false,
+  voteRound:0,      
+  cardVotes:{},     
+  bottleAngle:0,bottleSpinning:false,bottleRound:1,
+  tabu:{
+    players:[],difficulty:'easy', category:'genel',
+    cards:[],cardIdx:0,
+    teams:[],activeTeam:0,
+    correct:0,skip:0, turnSkipsLeft:3,
+    timerInterval:null, selectedTime:60, timeLeft:60, totalTime:60,
+  },
+  wave: {
+    pool: [],
+    target: 0,
+    score: 0,
+    round: 1
+  }
+};
+
+/* ══════════════ SCREENS ══════════════ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showPick(){showScreen('screen-pick');}
+function showSetup(){
+  const mlt=document.getElementById('mltOptions');
+  const btn=document.getElementById('btnStartGame');
+  mlt.style.display=st.game==='mlto'?'flex':'none';
+  btn.className='btn '+(st.game==='mlto'?'btn-red':'btn-amber');
+  renderPlayers(); showScreen('screen-setup');
+}
+function showScore(){
+  if(!st.players.length&&!st.tabu.players.length){alert('Henüz oyun oynanmadı!');return;}
+  renderScoreboard(); showScreen('screen-score');
+  setTimeout(()=>launchConfetti(), 200);
+}
+
+/* ══════════════ PLAYERS (MLT/Bottle) ══════════════ */
+function addPlayer(){
+  const inp=document.getElementById('playerInput');
+  const name=inp.value.trim();
+  if(!name||st.players.includes(name)){inp.value='';return;}
+  if(st.players.length>=8){alert('Maksimum 8 oyuncu!');return;}
+  st.players.push(name); st.scores[name]=st.scores[name]||0;
+  inp.value=''; renderPlayers();
+}
+function removePlayer(name){st.players=st.players.filter(p=>p!==name);renderPlayers();}
+function renderPlayers(){
+  document.getElementById('playersList').innerHTML=st.players.map((p,i)=>`
+    <div class="player-tag">
+      <div class="player-left">
+        <div class="player-dot" style="background:${DOT_COLORS[i%8]}"></div>
+        <div class="player-name">${p}</div>
+      </div>
+      <button class="remove-btn" data-remove="${p}">✕</button>
+    </div>`).join('');
+}
+
+/* ══════════════ MLT CONFIG ══════════════ */
+function setMode(m){
+  st.mode=m;
+  document.getElementById('modeVote').classList.toggle('active',m==='vote');
+  document.getElementById('modeCard').classList.toggle('active',m==='card');
+  document.getElementById('modeHint').textContent=
+    m==='vote'?'Herkes grubun en çok kimi seçeceğini oylayacak':'Kartı çek, soruyu oku, birini seç';
+}
+function startCurrentGame(){
+  if(st.players.length<2){alert('En az 2 oyuncu gerekli!');showSetup();return;}
+  if(st.game==='mlto')startMLTO(); else startBottle();
+}
+
+/* ══════════════ MLTO ══════════════ */
+function startMLTO(){
+  st.questions=[...MLT_QUESTIONS].sort(()=>Math.random()-.5).slice(0,st.qCount);
+  st.current=0; st.cardFlipped=false;
+  renderCard(); showScreen('screen-game');
+}
+function renderCard(){
+  const total=st.questions.length,i=st.current;
+  document.getElementById('progressBar').style.width=Math.round((i/total)*100)+'%';
+  document.getElementById('cardCount').textContent=`${i+1}/${total}`;
+  document.getElementById('cardQuestion').textContent=st.questions[i]||'—';
+  document.getElementById('mainCard').classList.remove('flipped');
+  st.cardFlipped=false;
+  st.voteRound=0;
+  st.cardVotes={};
+  if(st.mode==='vote'){
+    renderVoterTurn();
+  }else{
+    document.getElementById('voteSection').innerHTML=`
+      <div class="vote-grid">
+        ${st.players.map(p=>`<button class="vote-btn" data-pick="${p}">${p}</button>`).join('')}
+      </div>`;
+  }
+}
+
+function renderVoterTurn(){
+  if(!st.voterOrder || st.voteRound===0){
+    st.voterOrder=[...Array(st.players.length).keys()].sort(()=>Math.random()-.5);
+  }
+  const voterIdx=st.voterOrder[st.voteRound];
+  const voter=st.players[voterIdx];
+  const color=DOT_COLORS[voterIdx%8];
+  const total=st.players.length;
+
+  const candidates=st.players.filter(p=>p!==voter);
+
+  document.getElementById('voteSection').innerHTML=`
+    <div class="voter-banner">
+      <div class="voter-dot" style="background:${color}"></div>
+      <div>
+        <div class="voter-label">Oy veriyor</div>
+        <div class="voter-name">${voter}</div>
+      </div>
+      <div class="voter-progress">${st.voteRound+1} / ${total}</div>
+    </div>
+    <div class="vote-grid" id="voteGrid">
+      ${candidates.map(p=>`<button class="vote-btn" data-vote="${p}">${p}</button>`).join('')}
+    </div>`;
+}
+
+function renderVoteResults(){
+  const counts={};
+  st.players.forEach(p=>counts[p]=0);
+  Object.values(st.cardVotes).forEach(v=>{ counts[v]=(counts[v]||0)+1; });
+  const maxV=Math.max(...Object.values(counts));
+  const sorted=[...st.players].sort((a,b)=>counts[b]-counts[a]);
+  const winners=sorted.filter(p=>counts[p]===maxV&&maxV>0);
+
+  document.getElementById('voteSection').innerHTML=`
+    <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:1px;text-align:center;margin-bottom:6px;">
+      SONUÇLAR ${winners.length>0?'🏆':''}
+    </div>
+    <div class="vote-tally">
+      ${sorted.map(p=>`
+        <div class="tally-row">
+          <div class="tally-name" style="color:${winners.includes(p)?'#ffd93d':'rgba(255,255,255,.7)'}">${p}</div>
+          <div class="tally-bar-wrap">
+            <div class="tally-bar" style="width:${maxV>0?Math.round((counts[p]/maxV)*100):0}%;${winners.includes(p)?'background:linear-gradient(90deg,#ffd93d,#ff6b6b)':''}"></div>
+          </div>
+          <div class="tally-count">${counts[p]}</div>
+        </div>`).join('')}
+    </div>`;
+  winners.forEach(w=>{ st.scores[w]=(st.scores[w]||0)+1; });
+}
+function flipCard(){
+  if(st.cardFlipped)return;
+  playSoundCardFlip();
+  document.getElementById('mainCard').classList.add('flipped'); st.cardFlipped=true;
+}
+function vote(player,btn){
+  if(!st.cardFlipped){flipCard();return;}
+  const voterIdx=st.voterOrder[st.voteRound];
+  const voter=st.players[voterIdx];
+  st.cardVotes[voter]=player;
+  document.querySelectorAll('#voteGrid .vote-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  st.voteRound++;
+  if(st.voteRound>=st.players.length){
+    setTimeout(()=>renderVoteResults(), 300);
+  } else {
+    setTimeout(()=>renderVoterTurn(), 350);
+  }
+}
+function pickPlayer(player,btn){
+  if(!st.cardFlipped){flipCard();return;}
+  document.querySelectorAll('#screen-game .vote-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  st.scores[player]=(st.scores[player]||0)+1;
+}
+function nextCard(){
+  st.current++;
+  if(st.current>=st.questions.length){
+    renderScoreboard(); showScreen('screen-score');
+    setTimeout(()=>launchConfetti(), 200);
+    return;
+  }
+  renderCard();
+}
+
+/* ══════════════ BOTTLE ══════════════ */
+function startBottle(){
+  st.bottleRound=1; st.bottleSpinning=false;
+  const w=document.getElementById('bottleWrap');
+  w.style.transition='none'; w.style.animation='none';
+  w.style.transform='rotate(0deg)';
+  st.bottleAngle=0;
+  void w.offsetWidth;
+  w.classList.add('idle-hint');
+  document.getElementById('bottleResult').innerHTML='<div class="bottle-result-idle">Şişeye dokun ve çevir! 🍺</div>';
+  document.getElementById('bottleRound').textContent='Tur 1';
+  document.getElementById('spinBtn').disabled=false;
+  renderBottlePlayers();
+  showScreen('screen-bottle');
+}
+
+function renderBottlePlayers(){
+  const wheel=document.getElementById('bottleWheel');
+  wheel.querySelectorAll('.pdot-wrap').forEach(el=>el.remove());
+  const n=st.players.length, R=128, CX=160, CY=160;
+  st.players.forEach((name,i)=>{
+    const a=((360/n)*i-90)*Math.PI/180;
+    const cx=CX+R*Math.cos(a), cy=CY+R*Math.sin(a);
+    const wrap=document.createElement('div');
+    wrap.className='pdot-wrap'; wrap.id=`pdot-${i}`;
+    wrap.style.cssText=`position:absolute;left:${cx-24}px;top:${cy-24}px;width:48px;height:48px;`;
+    const dot=document.createElement('div');
+    dot.className='pdot'; dot.style.background=DOT_COLORS[i%8]; dot.style.color='#fff';
+    dot.textContent=name.length>6?name.slice(0,5)+'…':name;
+    wrap.appendChild(dot); wheel.appendChild(wrap);
+  });
+}
+
+function spinBottle(){
+  if(st.bottleSpinning)return;
+  st.bottleSpinning=true;
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('bottleResult').innerHTML='<div class="bottle-result-idle">🌀 Çevriliyor...</div>';
+  document.querySelectorAll('.pdot').forEach(d=>d.classList.remove('highlighted'));
+
+  const w=document.getElementById('bottleWrap');
+  w.style.animation='none';
+  w.style.transition='none';
+  void w.offsetWidth;
+
+  const n=st.players.length;
+  const targetIdx=Math.floor(Math.random()*n);
+  const targetAngleDeg=(360/n)*targetIdx;
+
+  const curNorm=((st.bottleAngle%360)+360)%360;
+  let diff=((targetAngleDeg-curNorm)+360)%360;
+  if(diff<30)diff+=360; 
+
+  const extraSpins=(8+Math.floor(Math.random()*5))*360;
+  const finalAngle=st.bottleAngle+extraSpins+diff;
+  const dur=3000+Math.random()*1500;
+
+  w.style.transition=`transform ${dur}ms cubic-bezier(0.17,0.72,0.22,1.0)`;
+  w.style.transform=`rotate(${finalAngle}deg)`;
+  st.bottleAngle=finalAngle;
+
+  setTimeout(()=>{
+    w.style.transition='none';
+    w.style.transform=`rotate(${finalAngle}deg)`;
+    st.bottleSpinning=false;
+    document.getElementById('spinBtn').disabled=false;
+    setTimeout(()=>{w.style.animation='';w.classList.add('idle-hint');},600);
+
+    document.querySelectorAll('.pdot').forEach(d=>d.classList.remove('highlighted'));
+    const dot=document.querySelector(`#pdot-${targetIdx} .pdot`);
+    if(dot)dot.classList.add('highlighted');
+
+    const winner=st.players[targetIdx];
+    st.scores[winner]=(st.scores[winner]||0)+1;
+    st.bottleRound++;
+    document.getElementById('bottleRound').textContent=`Tur ${st.bottleRound}`;
+    showChoicePopup(winner);
+  },dur+100);
+}
+
+function showChoicePopup(winner){
+  document.getElementById('bottleResult').innerHTML=`
+    <div class="choice-winner">🎯 ${winner}</div>
+    <div class="choice-q">Ne seçiyorsun?</div>
+    <div class="choice-btns">
+      <button class="choice-btn choice-truth" data-choice="truth" data-winner="${winner}">💬 Doğruluk</button>
+      <button class="choice-btn choice-dare" data-choice="dare" data-winner="${winner}">⚡ Cesaret</button>
+    </div>`;
+}
+function revealChallenge(winner,isTruth){
+  const list=isTruth?TRUTHS:DARES;
+  const ch=list[Math.floor(Math.random()*list.length)];
+  document.getElementById('bottleResult').innerHTML=`
+    <div class="dare-badge ${isTruth?'badge-truth':'badge-dare'}">${isTruth?'✦ DOĞRULUK':'⚡ CESARET'}</div>
+    <div class="bottle-result-winner">${winner}</div>
+    <div class="bottle-result-challenge">${ch}</div>`;
+}
+
+/* ══════════════ TABU KURULUM ══════════════ */
+function addTabuPlayer(){
+  const inp=document.getElementById('tabuPlayerInput');
+  const name=inp.value.trim();
+  if(!name||st.tabu.players.includes(name)){inp.value='';return;}
+  if(st.tabu.players.length>=8){alert('Maksimum 8 takım!');return;}
+  st.tabu.players.push(name);
+  inp.value=''; renderTabuPlayers();
+}
+function removeTabuPlayer(name){
+  st.tabu.players=st.tabu.players.filter(p=>p!==name); renderTabuPlayers();
+}
+function renderTabuPlayers(){
+  document.getElementById('tabuPlayersList').innerHTML=st.tabu.players.map((p,i)=>`
+    <div class="player-tag">
+      <div class="player-left">
+        <div class="player-dot" style="background:${DOT_COLORS[i%8]}"></div>
+        <div class="player-name">${p}</div>
+      </div>
+      <button class="remove-btn" data-tabu-remove="${p}">✕</button>
+    </div>`).join('');
+}
+
+function setDifficulty(diff){
+  st.tabu.difficulty=diff;
+  document.querySelectorAll('[data-diff]').forEach(t=>t.classList.toggle('active',t.dataset.diff===diff));
+  document.getElementById('tabuDiffHint').textContent=DIFF_CONFIG[diff].label;
+}
+
+function setTabuCategory(cat){
+  st.tabu.category = cat;
+  document.querySelectorAll('[data-tabu-cat]').forEach(t => t.classList.toggle('active', t.dataset.tabuCat === cat));
+}
+
+function setTabuTime(time){
+  st.tabu.selectedTime = parseInt(time);
+  document.querySelectorAll('[data-tabu-time]').forEach(t => t.classList.toggle('active', parseInt(t.dataset.tabuTime) === parseInt(time)));
+}
+
+function updateSkipButtonUI() {
+  const skipBtn = document.getElementById('btnTabuSkip');
+  skipBtn.textContent = '⏭ Pas (' + st.tabu.turnSkipsLeft + ')';
+  if (st.tabu.turnSkipsLeft <= 0) {
+    skipBtn.disabled = true;
+  } else {
+    skipBtn.disabled = false;
+  }
+}
+
+/* ══════════════ TABU OYUN ══════════════ */
+function startTabu(){
+  if(st.tabu.players.length<2){alert('En az 2 takım gerekli!');return;}
+  
+  const pool=[...TABU_CATEGORIES[st.tabu.category]].sort(()=>Math.random()-.5);
+  st.tabu.cards=pool;
+  st.tabu.cardIdx=0;
+  st.tabu.activeTeam=0;
+  st.tabu.correct=0;
+  st.tabu.skip=0;
+  
+  st.tabu.totalTime=st.tabu.selectedTime;
+  st.tabu.timeLeft=st.tabu.selectedTime;
+  st.tabu.turnSkipsLeft=3;
+  
+  st.tabu.teams=st.tabu.players.map(p=>({name:p,score:0}));
+  st.game='tabu';
+  st.players=[...st.tabu.players];
+  st.tabu.players.forEach(p=>{st.scores[p]=0;});
+  
+  updateSkipButtonUI();
+  renderTabuCard();
+  renderTabuScores();
+  startTabuTimer();
+  showScreen('screen-tabu');
+}
+
+function renderTabuCard(){
+  const cfg=DIFF_CONFIG[st.tabu.difficulty];
+  const cards=st.tabu.cards;
+  if(st.tabu.cardIdx>=cards.length){
+    st.tabu.cards=[...TABU_CATEGORIES[st.tabu.category]].sort(()=>Math.random()-.5);
+    st.tabu.cardIdx=0;
+  }
+  const card=st.tabu.cards[st.tabu.cardIdx];
+  document.getElementById('tabuWord').textContent=card.word;
+  
+  const forbidCount=cfg.forbidden;
+  document.getElementById('tabuForbidden').innerHTML=
+    card.forbidden.slice(0,forbidCount).map(w=>`<div class="tabu-forbidden-item">${w}</div>`).join('');
+  document.getElementById('tabuInfo').textContent=`Kart ${st.tabu.cardIdx+1} • ${st.tabu.teams[st.tabu.activeTeam].name}`;
+}
+
+function renderTabuScores(){
+  const row=document.getElementById('tabuScoreRow');
+  row.innerHTML=st.tabu.teams.map((t,i)=>`
+    <div class="tabu-team${i===st.tabu.activeTeam?' active-team':''}">
+      <div class="tabu-team-name">${t.name}</div>
+      <div class="tabu-team-score">${t.score}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════════
+   SES MOTORU — Web Audio API (internetsiz)
+══════════════════════════════════════════════ */
+let audioCtx = null;
+let heartbeatInterval = null;
+
+function getAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playSoundCardFlip(){
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const bufSize = ctx.sampleRate * 0.12;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i=0;i<bufSize;i++) data[i]=(Math.random()*2-1);
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(2200, t);
+  filter.frequency.exponentialRampToValueAtTime(800, t+0.1);
+  filter.Q.value = 1.2;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.55, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t+0.11);
+  noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  noise.start(t); noise.stop(t+0.12);
+  const o = ctx.createOscillator(), g2 = ctx.createGain();
+  o.connect(g2); g2.connect(ctx.destination);
+  o.type='triangle'; o.frequency.setValueAtTime(1800,t);
+  o.frequency.exponentialRampToValueAtTime(400,t+0.06);
+  g2.gain.setValueAtTime(0.12,t);
+  g2.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+  o.start(t); o.stop(t+0.07);
+}
+
+function playSoundCorrect(){
+  const ctx = getAudioCtx();
+  [523,659,784,1047].forEach((f,i)=>{
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type='sine'; o.frequency.value=f;
+    const t=ctx.currentTime+i*0.09;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(0.22,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+    o.start(t); o.stop(t+0.22);
+  });
+}
+
+function playSoundWrong(){
+  const ctx = getAudioCtx();
+  [280,220,160].forEach((f,i)=>{
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type='sawtooth'; o.frequency.value=f;
+    const t=ctx.currentTime+i*0.13;
+    g.gain.setValueAtTime(0.2,t);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+    o.start(t); o.stop(t+0.23);
+  });
+}
+
+function playSoundTimeUp(){
+  const ctx = getAudioCtx();
+  [880,660,440].forEach((f,i)=>{
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type='square';
+    o.frequency.setValueAtTime(f,ctx.currentTime+i*0.15);
+    g.gain.setValueAtTime(0.28,ctx.currentTime+i*0.15);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.15+0.2);
+    o.start(ctx.currentTime+i*0.15);
+    o.stop(ctx.currentTime+i*0.15+0.2);
+  });
+}
+
+function playSoundSkip(){
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  [500,380].forEach((f,i)=>{
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type='triangle'; o.frequency.value=f;
+    const st2=t+i*0.1;
+    g.gain.setValueAtTime(0.13,st2);
+    g.gain.exponentialRampToValueAtTime(0.001,st2+0.1);
+    o.start(st2); o.stop(st2+0.1);
+  });
+}
+
+let tikTak = true;
+function playTikTak(timeLeft, totalTime){
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const pct = timeLeft / totalTime;
+  const freq  = tikTak ? 1050 : 820;
+  const freq2 = tikTak ? 620  : 480;
+  const vol = 0.07 + (1 - pct) * 0.05;
+
+  const bufLen = Math.floor(ctx.sampleRate * 0.025);
+  const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i = 0; i < bufLen; i++) d[i] = (Math.random()*2-1) * (1 - i/bufLen);
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const nFilt = ctx.createBiquadFilter();
+  nFilt.type = 'bandpass';
+  nFilt.frequency.value = tikTak ? 3500 : 2200;
+  nFilt.Q.value = 1.8;
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(vol * 0.6, t);
+  nGain.gain.exponentialRampToValueAtTime(0.001, t + 0.022);
+  noise.connect(nFilt); nFilt.connect(nGain); nGain.connect(ctx.destination);
+  noise.start(t); noise.stop(t + 0.025);
+
+  const osc = ctx.createOscillator();
+  const oGain = ctx.createGain();
+  osc.connect(oGain); oGain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, t);
+  osc.frequency.exponentialRampToValueAtTime(freq2, t + 0.04);
+  oGain.gain.setValueAtTime(vol, t);
+  oGain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+  osc.start(t); osc.stop(t + 0.05);
+
+  tikTak = !tikTak;
+}
+
+function startHeartbeat(timeLeft, totalTime){
+  stopHeartbeat();
+  if(timeLeft <= 0) return;
+  const pct = timeLeft / totalTime;
+  let interval;
+  if(pct > 0.25)      interval = 1000;
+  else if(pct > 0.12) interval = 750;
+  else                interval = 500;
+  playTikTak(timeLeft, totalTime);
+  heartbeatInterval = setInterval(()=>{
+    playTikTak(st.tabu.timeLeft, totalTime);
+  }, interval);
+}
+
+function stopHeartbeat(){
+  if(heartbeatInterval){ clearInterval(heartbeatInterval); heartbeatInterval=null; }
+}
+function stopAllTabuSounds(){ stopHeartbeat(); }
+
+/* ══════════════════════════════════════════════
+   KONFETİ MOTORU
+══════════════════════════════════════════════ */
+const CONFETTI_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9f43','#00d2d3','#ff9ff3','#fff'];
+let confettiParticles=[];
+let confettiRAF=null;
+
+function launchConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  const W=canvas.width=window.innerWidth;
+  const H=canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  confettiParticles=[];
+
+  for(let i=0;i<180;i++){
+    const angle=(Math.random()*360)*Math.PI/180;
+    const speed=4+Math.random()*8;
+    confettiParticles.push({
+      x: W/2 + (Math.random()-0.5)*W*0.6,
+      y: H*0.4,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed - 6,
+      w: 7+Math.random()*7,
+      h: 5+Math.random()*5,
+      rot: Math.random()*360,
+      rotV: (Math.random()-0.5)*8,
+      color: CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+      alpha:1, life:1
+    });
+  }
+
+  cancelAnimationFrame(confettiRAF);
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    let alive=false;
+    confettiParticles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      p.vy+=0.28;          
+      p.vx*=0.99;          
+      p.rot+=p.rotV;
+      p.life-=0.012;
+      p.alpha=Math.max(0,p.life);
+      if(p.alpha>0){
+        alive=true;
+        ctx.save();
+        ctx.globalAlpha=p.alpha;
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle=p.color;
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+        ctx.restore();
+      }
+    });
+    if(alive) confettiRAF=requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,W,H);
+  }
+  draw();
+
+  const ac=getAudioCtx();
+  [523,659,784,880,1047,1318].forEach((f,i)=>{
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type='sine'; o.frequency.value=f;
+    const st2=ac.currentTime+i*0.05;
+    g.gain.setValueAtTime(0,st2);
+    g.gain.linearRampToValueAtTime(0.18,st2+0.03);
+    g.gain.exponentialRampToValueAtTime(0.001,st2+0.4);
+    o.start(st2); o.stop(st2+0.4);
+  });
+  const bufSz=ac.sampleRate*0.15;
+  const buf=ac.createBuffer(1,bufSz,ac.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<bufSz;i++) d[i]=(Math.random()*2-1);
+  const ns=ac.createBufferSource();
+  ns.buffer=buf;
+  const flt=ac.createBiquadFilter(); flt.type='highpass'; flt.frequency.value=3000;
+  const gn=ac.createGain(); gn.gain.setValueAtTime(0.3,ac.currentTime);
+  gn.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);
+  ns.connect(flt); flt.connect(gn); gn.connect(ac.destination);
+  ns.start(); ns.stop(ac.currentTime+0.15);
+}
+
+/* ══════════════ TABU TIMER ══════════════ */
+function startTabuTimer(){
+  clearInterval(st.tabu.timerInterval);
+  stopAllTabuSounds();
+  const total=st.tabu.totalTime;
+  st.tabu.timeLeft=total;
+  updateTimerBar();
+  startHeartbeat(total, total);
+  st.tabu.timerInterval=setInterval(()=>{
+    st.tabu.timeLeft--;
+    updateTimerBar();
+    startHeartbeat(st.tabu.timeLeft, total);
+    if(st.tabu.timeLeft<=0){
+      clearInterval(st.tabu.timerInterval);
+      stopHeartbeat();
+      playSoundTimeUp();
+      tabuTimeUp();
+    }
+  },1000);
+}
+
+function updateTimerBar(){
+  const pct=(st.tabu.timeLeft/st.tabu.totalTime)*100;
+  const bar=document.getElementById('tabuTimerBar');
+  const txt=document.getElementById('tabuTimerText');
+  
+  bar.style.width=pct+'%';
+  txt.textContent = st.tabu.timeLeft + 's';
+  
+  if(pct > 50) {
+    bar.style.background='linear-gradient(90deg,#22c55e,#86efac)';
+    bar.classList.remove('timer-danger');
+    txt.classList.remove('timer-text-danger');
+  } 
+  else if(pct > 25 && st.tabu.timeLeft > 10) {
+    bar.style.background='linear-gradient(90deg,#f59e0b,#fcd34d)';
+    bar.classList.remove('timer-danger');
+    txt.classList.remove('timer-text-danger');
+  } 
+  else {
+    bar.style.background='linear-gradient(90deg,#ef4444,#fca5a5)';
+    if(st.tabu.timeLeft <= 10) {
+      bar.classList.add('timer-danger');
+      txt.classList.add('timer-text-danger');
+    }
+  }
+}
+
+function tabuCorrect(){
+  playSoundCorrect();
+  st.tabu.teams[st.tabu.activeTeam].score++;
+  st.scores[st.tabu.teams[st.tabu.activeTeam].name]++;
+  st.tabu.correct++;
+  st.tabu.cardIdx++;
+  renderTabuCard();
+  renderTabuScores();
+}
+
+function tabuMistake(){
+  playSoundWrong();
+  st.tabu.teams[st.tabu.activeTeam].score--;
+  st.scores[st.tabu.teams[st.tabu.activeTeam].name]--;
+  st.tabu.cardIdx++;
+  renderTabuCard();
+  renderTabuScores();
+}
+
+function tabuSkip(){
+  if (st.tabu.turnSkipsLeft <= 0) return;
+  playSoundSkip();
+  st.tabu.turnSkipsLeft--;
+  st.tabu.skip++;
+  st.tabu.cardIdx++;
+  updateSkipButtonUI();
+  renderTabuCard();
+}
+
+function tabuTimeUp(){
+  stopAllTabuSounds();
+  st.tabu.activeTeam=(st.tabu.activeTeam+1)%st.tabu.teams.length;
+  renderTabuScores();
+  
+  document.getElementById('tabuWord').innerHTML = `<button class="btn btn-purple" id="btnTabuNextTurn" style="margin-top:10px; font-size: 24px; padding: 12px 24px;">Sırayı Başlat 🚀</button>`;
+  document.getElementById('tabuForbidden').innerHTML=
+    `<div class="tabu-forbidden-item" style="justify-content:center;font-size:16px; background:rgba(255,217,61,0.2); border-color:#ffd93d; color:#ffd93d;">
+      Sıra: ${st.tabu.teams[st.tabu.activeTeam].name}</div>`;
+  
+  document.getElementById('tabuTimerBar').style.width = '0%';
+  document.getElementById('tabuTimerText').textContent = '0s';
+  
+  document.getElementById('btnTabuCorrect').disabled = true;
+  document.getElementById('btnTabuMistake').disabled = true;
+  document.getElementById('btnTabuSkip').disabled = true;
+}
+function startNextTabuTurn(){
+  st.tabu.turnSkipsLeft = 3;
+  updateSkipButtonUI();
+  document.getElementById('btnTabuCorrect').disabled = false;
+  document.getElementById('btnTabuMistake').disabled = false;
+  st.tabu.cardIdx++;
+  renderTabuCard();
+  startTabuTimer(); 
+}
+
+/* ══════════════ KİM BU OYUNU ══════════════ */
+let kb = {
+  category: null,
+  pool: [],
+  idx: 0,
+  totalScore: 0,
+  triesLeft: 3,
+  cluesShown: 1,
+  solved: false,
+  skipped: false,
+};
+
+function startKimBu(cat){
+  kb.category = cat;
+  kb.pool = [...KB_DATA[cat]].sort(()=>Math.random()-.5);
+  kb.idx = 0;
+  kb.totalScore = 0;
+  document.getElementById('kbCategoryPick').style.display='none';
+  document.getElementById('kbGameWrap').style.display='flex';
+  loadKbQuestion();
+}
+
+function loadKbQuestion(){
+  if(kb.idx >= kb.pool.length){
+    document.getElementById('kbGameWrap').innerHTML=`
+      <div style="text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;">
+        <div style="font-size:56px">🏆</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:38px;background:linear-gradient(135deg,#ffd93d,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Tebrikler!</div>
+        <div style="font-size:16px;color:rgba(255,255,255,.6);">Toplam puan: <b style="color:#ffd93d">${kb.totalScore}</b></div>
+        <button class="btn btn-green" id="btnKbRestart" style="max-width:260px">Tekrar Oyna 🔄</button>
+        <button class="btn btn-ghost" id="btnKbHomeEnd">← Ana Sayfa</button>
+      </div>`;
+    setTimeout(()=>launchConfetti(),300);
+    return;
+  }
+
+  const q = kb.pool[kb.idx];
+  kb.triesLeft = 3;
+  kb.cluesShown = 1;
+  kb.solved = false;
+  kb.skipped = false;
+
+  document.getElementById('kbScore').textContent = kb.totalScore + ' puan';
+
+  const icon = kb.category==='futbolcu' ? '⚽' : '🎬';
+  const clueLabels = {
+    futbolcu: '⚽ OYNADIĞI TAKIMLAR',
+    turk_futbolcu: '⚽ OYNADIĞI TAKIMLAR',
+    aktor: '🎬 OYNADIĞI FİLMLER',
+    turk_aktor: '📺 OYNADIĞI DİZİ / FİLMLER',
+  };
+  document.getElementById('kbClueLabel').textContent = clueLabels[kb.category] || '💡 İPUÇLARI';
+
+  renderKbClues();
+  renderKbBlanks(q.name);
+  document.getElementById('kbTries').textContent = '3 hakkın var';
+  document.getElementById('kbResultBox').innerHTML = '';
+  document.getElementById('kbInput').value = '';
+  document.getElementById('kbInput').disabled = false;
+  document.getElementById('btnKbSubmit').disabled = false;
+  document.getElementById('btnKbNext').style.display='none';
+  document.getElementById('btnKbSkipQ').style.display='';
+  document.getElementById('btnKbHint').style.display='';
+  document.getElementById('btnKbHint').textContent = '💡 İpucu Göster';
+}
+
+function renderKbClues(){
+  const q = kb.pool[kb.idx];
+  const list = document.getElementById('kbCluesList');
+  list.innerHTML = q.clues.slice(0, kb.cluesShown).map((c,i)=>`
+    <div class="kb-clue-item" style="animation-delay:${i*0.06}s">
+      <span class="kb-clue-icon">${(kb.category==='futbolcu'||kb.category==='turk_futbolcu')?'⚽':'🎥'}</span>${c}
+    </div>`).join('');
+  const remaining = q.clues.length - kb.cluesShown;
+  const hint = document.getElementById('btnKbHint');
+  if(remaining<=0 || kb.solved || kb.skipped){
+    hint.style.display='none';
+  } else {
+    hint.textContent=`💡 Bir İpucu Daha (${remaining} kaldı)`;
+  }
+}
+
+function renderKbBlanks(name, revealAll=false){
+  const words = name.split(' ');
+  document.getElementById('kbBlanks').innerHTML = words.map(word=>`
+    <div class="kb-blank-word">
+      ${word.split('').map((ch,i)=>{
+        const show = revealAll || ch===' ';
+        return `<div class="kb-letter${show?' revealed':''}" data-char="${ch.toLowerCase()}">${show?ch:''}</div>`;
+      }).join('')}
+    </div>`).join('<div style="width:8px"></div>');
+}
+
+function revealLetterHint(name){
+  const letters = document.querySelectorAll('.kb-letter:not(.revealed)');
+  if(letters.length===0) return;
+  const first = letters[0];
+  first.classList.add('revealed');
+  first.textContent = first.dataset.char.toUpperCase();
+}
+
+function kbNorm(s){
+  return s.toLowerCase()
+    .replace(/ğ/g,'g').replace(/Ğ/g,'g')
+    .replace(/ü/g,'u').replace(/Ü/g,'u')
+    .replace(/ş/g,'s').replace(/Ş/g,'s')
+    .replace(/ı/g,'i').replace(/İ/g,'i')
+    .replace(/ö/g,'o').replace(/Ö/g,'o')
+    .replace(/ç/g,'c').replace(/Ç/g,'c')
+    .replace(/[^a-z0-9 ]/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+
+function levenshtein(a, b){
+  const m=a.length, n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>j===0?i:0));
+  for(let j=1;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++)
+    for(let j=1;j<=n;j++)
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1]
+        : 1+Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function similarity(a, b){
+  const na=kbNorm(a), nb=kbNorm(b);
+  if(na===nb) return 1;
+  const maxLen=Math.max(na.length, nb.length);
+  if(maxLen===0) return 1;
+  return 1 - levenshtein(na,nb)/maxLen;
+}
+
+function lastNameMatch(guess, answer){
+  const parts = kbNorm(answer).split(' ');
+  if(parts.length < 2) return false;
+  const lastName = parts[parts.length-1];
+  const g = kbNorm(guess);
+  return g===lastName || (lastName.length>=4 && similarity(g,lastName)>=0.85);
+}
+
+function isCorrectGuess(guess, answer){
+  if(!guess) return false;
+  const sim = similarity(guess, answer);
+  if(sim >= 0.80) return true;
+  if(lastNameMatch(guess, answer)) return true;
+  const gWords = kbNorm(guess).split(' ').sort().join(' ');
+  const aWords = kbNorm(answer).split(' ').sort().join(' ');
+  if(similarity(gWords, aWords) >= 0.80) return true;
+  return false;
+}
+
+function submitKbGuess(){
+  if(kb.solved || kb.skipped) return;
+  const q = kb.pool[kb.idx];
+  const input = document.getElementById('kbInput');
+  const guess = input.value.trim();
+  if(!guess) return;
+
+  const sim = similarity(guess, q.name);
+  const correct = isCorrectGuess(guess, q.name);
+  const veryClose = !correct && sim >= 0.60;
+
+  if(correct){
+    kb.solved = true;
+    const pts = kb.triesLeft * 10 + (kb.cluesShown===1?20:kb.cluesShown===2?10:5);
+    kb.totalScore += pts;
+    playSoundCorrect();
+    renderKbBlanks(q.name, true);
+    const fuzzyNote = sim < 1 && sim >= 0.80 ? `<div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;">yakın sayıldı ✓</div>` : '';
+    document.getElementById('kbResultBox').innerHTML=`
+      <div class="kb-result-win">
+        <div class="kb-result-title" style="color:#6bcb77">🎉 Doğru!</div>
+        <div class="kb-result-name">${q.name}</div>
+        ${fuzzyNote}
+        <div class="kb-score-pill">+${pts} puan</div>
+      </div>`;
+    document.getElementById('kbInput').disabled=true;
+    document.getElementById('btnKbSubmit').disabled=true;
+    document.getElementById('btnKbNext').style.display='';
+    document.getElementById('btnKbSkipQ').style.display='none';
+    document.getElementById('btnKbHint').style.display='none';
+    document.getElementById('kbScore').textContent=kb.totalScore+' puan';
+    launchConfetti();
+  } else {
+    playSoundWrong();
+    kb.triesLeft--;
+    input.value='';
+    document.querySelectorAll('.kb-letter').forEach(l=>{
+      l.classList.add('wrong-flash');
+      setTimeout(()=>l.classList.remove('wrong-flash'),400);
+    });
+    if(kb.triesLeft<=0){
+      kbGameOver();
+    } else {
+      const tryMsg = kb.triesLeft===2 ? '2 hakkın kaldı' : 'Son hakkın!';
+      const closeMsg = veryClose ? ' 🔥 Çok yaklaştın!' : '';
+      document.getElementById('kbTries').textContent = tryMsg + closeMsg;
+      revealLetterHint(q.name);
+    }
+  }
+}
+
+function kbGameOver(){
+  kb.solved=false; kb.skipped=true;
+  const q=kb.pool[kb.idx];
+  playSoundWrong();
+  renderKbBlanks(q.name, true);
+  document.getElementById('kbResultBox').innerHTML=`
+    <div class="kb-result-lose">
+      <div class="kb-result-title" style="color:#ff6b6b">😔 Hakkın Bitti</div>
+      <div class="kb-result-name">Cevap: <b style="color:#ffd93d">${q.name}</b></div>
+    </div>`;
+  document.getElementById('kbInput').disabled=true;
+  document.getElementById('btnKbSubmit').disabled=true;
+  document.getElementById('btnKbNext').style.display='';
+  document.getElementById('btnKbSkipQ').style.display='none';
+  document.getElementById('btnKbHint').style.display='none';
+}
+
+function kbShowHint(){
+  const q=kb.pool[kb.idx];
+  if(kb.cluesShown<q.clues.length){
+    kb.cluesShown++;
+    renderKbClues();
+  }
+}
+
+function kbSkip(){
+  kb.skipped=true;
+  const q=kb.pool[kb.idx];
+  renderKbBlanks(q.name,true);
+  document.getElementById('kbResultBox').innerHTML=`
+    <div class="kb-result-lose">
+      <div class="kb-result-title" style="color:rgba(255,255,255,.5)">⏭ Geçildi</div>
+      <div class="kb-result-name">Cevap: <b style="color:#ffd93d">${q.name}</b></div>
+    </div>`;
+  document.getElementById('kbInput').disabled=true;
+  document.getElementById('btnKbSubmit').disabled=true;
+  document.getElementById('btnKbNext').style.display='';
+  document.getElementById('btnKbSkipQ').style.display='none';
+  document.getElementById('btnKbHint').style.display='none';
+}
+
+function kbNext(){
+  kb.idx++;
+  loadKbQuestion();
+}
+
+function showKimBu(){
+  kb.pool=[]; kb.idx=0; kb.totalScore=0;
+  document.getElementById('kbCategoryPick').style.display='flex';
+  document.getElementById('kbGameWrap').style.display='none';
+  document.getElementById('kbScore').textContent='0 puan';
+  showScreen('screen-kimbu');
+}
+
+/* ══════════════ QUIZ OYUNU ══════════════ */
+let qz = {
+  seriesIdx: 0,
+  questions: [],
+  qIdx: 0,
+  score: 0,
+  answered: false,
+  bestStreak: 0,
+  currentStreak: 0,
+};
+
+function showQuiz(){
+  qz.score=0; qz.qIdx=0; qz.answered=false; qz.bestStreak=0; qz.currentStreak=0;
+  const grid = document.getElementById('quizSeriesGrid');
+  grid.innerHTML = QUIZ_DATA.map((s,i)=>`
+    <button class="quiz-series-btn" data-qseries="${i}"
+      style="background:${s.color};box-shadow:0 8px 20px ${s.shadow};">
+      <div class="quiz-series-emoji">${s.emoji}</div>
+      <div class="quiz-series-name">${s.name}</div>
+      <div class="quiz-series-count">${s.questions.length} soru</div>
+    </button>`).join('');
+  document.getElementById('quizSeriesPick').style.display='flex';
+  document.getElementById('quizGameArea').style.display='none';
+  document.getElementById('quizResultArea').style.display='none';
+  showScreen('screen-quiz');
+}
+
+function startQuizSeries(idx){
+  const series = QUIZ_DATA[idx];
+  qz.seriesIdx = idx;
+  qz.questions = [...series.questions].sort(()=>Math.random()-.5);
+  qz.qIdx = 0; qz.score = 0; qz.answered = false;
+  qz.bestStreak = 0; qz.currentStreak = 0;
+
+  document.getElementById('quizSeriesLabel').textContent = series.emoji+' '+series.name;
+  const col = series.color;
+  document.getElementById('quizProgBar').style.background = col;
+  document.getElementById('quizSeriesPick').style.display='none';
+  document.getElementById('quizGameArea').style.display='flex';
+  document.getElementById('quizResultArea').style.display='none';
+  loadQuizQuestion();
+}
+
+function loadQuizQuestion(){
+  const q = qz.questions[qz.qIdx];
+  if(!q){ showQuizResult(); return; }
+  qz.answered = false;
+  const total = qz.questions.length;
+  const pct = Math.round((qz.qIdx/total)*100);
+
+  document.getElementById('quizProgBar').style.width = pct+'%';
+  document.getElementById('quizQNum').textContent = `Soru ${qz.qIdx+1} / ${total}`;
+  document.getElementById('quizPts').textContent = qz.score+' puan';
+  document.getElementById('quizQText').textContent = q.q;
+  document.getElementById('quizExplain').className='quiz-explain';
+  document.getElementById('quizExplain').textContent='';
+  document.getElementById('btnQuizNext').style.display='none';
+  document.getElementById('btnQuizSkip').style.display='';
+
+  const letters=['A','B','C','D'];
+  document.getElementById('quizChoices').innerHTML = q.choices.map((c,i)=>`
+    <button class="quiz-choice" data-qchoice="${i}">
+      <div class="quiz-choice-letter">${letters[i]}</div>
+      <span>${c}</span>
+    </button>`).join('');
+}
+
+function answerQuiz(choiceIdx){
+  if(qz.answered) return;
+  qz.answered = true;
+  const q = qz.questions[qz.qIdx];
+  const correct = (choiceIdx === q.answer);
+
+  document.querySelectorAll('.quiz-choice').forEach((btn,i)=>{
+    btn.classList.add('disabled');
+    if(i===q.answer) btn.classList.add('correct');
+    else if(i===choiceIdx && !correct) btn.classList.add('wrong');
+  });
+
+  const exp = document.getElementById('quizExplain');
+  exp.textContent = q.explain;
+  exp.classList.add('show');
+
+  if(correct){
+    qz.currentStreak++;
+    if(qz.currentStreak>qz.bestStreak) qz.bestStreak=qz.currentStreak;
+    const bonus = Math.min(qz.currentStreak-1,3)*5;
+    const pts = 10+bonus;
+    qz.score += pts;
+    document.getElementById('quizPts').textContent = qz.score+' puan';
+    playSoundCorrect();
+  } else {
+    qz.currentStreak=0;
+    playSoundWrong();
+  }
+
+  document.getElementById('btnQuizNext').style.display='';
+  document.getElementById('btnQuizSkip').style.display='none';
+}
+
+function quizSkip(){
+  if(qz.answered) return;
+  qz.answered=true;
+  qz.currentStreak=0;
+  const q=qz.questions[qz.qIdx];
+  document.querySelectorAll('.quiz-choice').forEach((btn,i)=>{
+    btn.classList.add('disabled');
+    if(i===q.answer) btn.classList.add('correct');
+  });
+  const exp=document.getElementById('quizExplain');
+  exp.textContent=q.explain; exp.classList.add('show');
+  document.getElementById('btnQuizNext').style.display='';
+  document.getElementById('btnQuizSkip').style.display='none';
+  playSoundSkip();
+}
+
+function showQuizResult(){
+  document.getElementById('quizGameArea').style.display='none';
+  document.getElementById('quizResultArea').style.display='flex';
+  const total=qz.questions.length;
+  const maxPts=total*10;
+  const pct=qz.score/maxPts;
+  let emoji='😅', streakMsg='';
+  if(pct>=0.9) emoji='🏆';
+  else if(pct>=0.7) emoji='🎉';
+  else if(pct>=0.5) emoji='👍';
+  document.getElementById('quizResEmoji').textContent=emoji;
+  document.getElementById('quizResPts').textContent=qz.score;
+  if(qz.bestStreak>=3) streakMsg=`🔥 En uzun seri: ${qz.bestStreak} doğru!`;
+  document.getElementById('quizResStreak').textContent=streakMsg;
+  if(pct>=0.7) setTimeout(()=>launchConfetti(),300);
+}
+
+/* ══════════════ O MU BU MU (OMB) ══════════════ */
+const OMB_DATA = {
+  good: [
+    "Sınırsız banka hesabı","Işınlanabilme yeteneği","Zihin okuyabilme","Görünmez olabilme",
+    "Geçmişe gidebilmek","Geleceği görebilmek","Hiç hastalanmamak","Her yediğinin 0 kalori olması",
+    "Tüm dünya dillerini konuşabilmek","Hayvanlarla konuşabilmek","Sonsuz ömür","Her gece harika rüyalar görmek",
+    "İstediğin an uyuyabilmek","Uçabilmek","Su altında nefes alabilmek","Her gün yeni bir ülkeye seyahat etmek",
+    "Sınırsız şans","Dünyanın en zeki insanı olmak","Dünyanın en çekici insanı olmak","İstediğin kişinin sana aşık olması",
+    "Mükemmel bir şarkı sesi","Herhangi bir enstrümanı kusursuz çalmak","Sınırsız tatil hakkı","İstediğin meslekte en iyi olmak",
+    "Telekinezi (eşyaları zihinle uçurma)","Suyu şaraba dönüştürebilmek","Zamanı durdurabilmek","Günde 2 saat uykuyla tamamen dinlenmek",
+    "Dünyadaki tüm kitapları anında okumuş olmak","İstediğin filme/oyuna kendini ışınlamak","Herhangi bir yalanı anında yakalamak","Mükemmel bir hafıza",
+    "Asla yaşlanmamak","Sınırsız alışveriş çeki","Kendi özel adana sahip olmak","Uzayda güvenle seyahat edebilmek",
+    "Milyonlarca hayranı olan bir rockstar olmak","Kimseye hesap vermeden yaşamak","Her iddiayı/bahsi kazanmak","Dünyaya barış getirebilmek"
+  ],
+  bad: [
+    "Her gün aynı yemeği yemek","Ömür boyu internetsiz yaşamak","Her gün alarmdan 1 saat önce uyanmak","Hiçbir zaman müzik dinleyememek",
+    "Sürekli kaşınmak","Her gün ıslak çorap giymek","Kahvenin her zaman soğuk olması","Telefon şarjının %10'u geçmemesi",
+    "Herkesin senin ne düşündüğünü duyması","Sürekli burnunun tıkalı olması","Tat alma duyunu kaybetmek","Her gece kabus görmek",
+    "Ömür boyu hıçkırmak","Sıcak suyla duş alamamak","Aşık olduğun kişinin senden nefret etmesi","Sürekli diş ağrısı çekmek",
+    "Her filmde sonunu önceden bilmek","Sonsuza dek yalnız yaşamak","Tüm paranı bir günde kaybetmek","Zamanın normalden 2 kat yavaş geçmesi",
+    "Hiçbir zaman tam doymamak","Sürekli izleniyormuş hissine kapılmak","Tüm sırlarının internete sızması","Evcil hayvanının senden kaçması",
+    "Günde sadece 100 kelime konuşabilmek","Sürekli baş ağrısı çekmek","Sadece kötü kokuları alabilmek","Her yalan söylediğinde fiziksel acı çekmek",
+    "Sürekli üşümek","Her gece yatakta sivrisinek vızıltısı duymak","Telefonunu bir daha asla sessize alamamak","Sadece çiğ et yiyebilmek",
+    "Her gün tanımadığın biri tarafından tokatlanmak","Ayak parmağını her gün sehpaya çarpmak","Uyurken sürekli düşme hissi yaşamak","Saçlarının her gün dökülüp yeniden çıkması"
+  ]
+};
+
+const OMB_COLORS = [
+  { top:'linear-gradient(135deg,#1e3a8a,#1e40af)', bottom:'linear-gradient(135deg,#3b82f6,#60a5fa)' },
+  { top:'linear-gradient(135deg,#064e3b,#065f46)', bottom:'linear-gradient(135deg,#10b981,#34d399)' },
+  { top:'linear-gradient(135deg,#4c1d95,#5b21b6)', bottom:'linear-gradient(135deg,#a855f7,#c084fc)' },
+  { top:'linear-gradient(135deg,#7f1d1d,#991b1b)', bottom:'linear-gradient(135deg,#ef4444,#f87171)' },
+  { top:'linear-gradient(135deg,#78350f,#92400e)', bottom:'linear-gradient(135deg,#f59e0b,#fbbf24)' },
+  { top:'linear-gradient(135deg,#111827,#1f2937)', bottom:'linear-gradient(135deg,#6b7280,#9ca3af)' },
+  { top:'linear-gradient(135deg,#831843,#9d174d)', bottom:'linear-gradient(135deg,#ec4899,#f472b6)' }
+];
+
+function getOmbPool(cat, count){
+  let arr=[...OMB_DATA[cat]];
+  while(arr.length<count) arr=arr.concat([...OMB_DATA[cat]]);
+  return arr.sort(()=>Math.random()-0.5).slice(0,count);
+}
+
+let omb={cat:'good',mode:'tournament',totalCount:32,pool:[],currentMatch:[],nextPool:[],roundName:'',matchIndex:0,matchTotal:0,kingChamp:null};
+let lastOmbColorIdx=-1;
+
+function applyRandomOmbColors(){
+  let idx=Math.floor(Math.random()*OMB_COLORS.length);
+  while(idx===lastOmbColorIdx) idx=Math.floor(Math.random()*OMB_COLORS.length);
+  lastOmbColorIdx=idx;
+  const pair=OMB_COLORS[idx];
+  document.getElementById('ombTextTop').style.background=pair.top;
+  document.getElementById('ombTextBottom').style.background=pair.bottom;
+}
+
+function showOmbSetup(){ showScreen('screen-omb-setup'); }
+
+function updateOmbModeHint(mode){
+  omb.mode=mode;
+  document.querySelectorAll('[data-omb-mode]').forEach(b=>b.classList.toggle('active',b.dataset.ombMode===mode));
+  document.getElementById('ombModeHint').textContent=mode==='tournament'
+    ?"Turnuva: Eşleşerek finale çıkılır."
+    :"Kral: Seçtiğin kalır, havuzdan yeni seçenek gelir.";
+}
+
+function startOmbGame(){
+  omb.pool=getOmbPool(omb.cat,omb.totalCount);
+  omb.nextPool=[];
+  if(omb.mode==='tournament') prepareTournamentRound();
+  else{
+    omb.kingChamp=omb.pool.pop();
+    omb.matchTotal=omb.totalCount-1;
+    omb.matchIndex=1;
+    loadKingMatch();
+  }
+  showScreen('screen-omb');
+}
+
+function prepareTournamentRound(){
+  omb.matchTotal=omb.pool.length/2;
+  omb.matchIndex=1;
+  const n=omb.pool.length;
+  if(n===64) omb.roundName="SON 64";
+  else if(n===32) omb.roundName="SON 32";
+  else if(n===16) omb.roundName="SON 16";
+  else if(n===8)  omb.roundName="ÇEYREK FİNAL";
+  else if(n===4)  omb.roundName="YARI FİNAL";
+  else if(n===2)  omb.roundName="FİNAL 🏆";
+  loadTournamentMatch();
+}
+
+function loadTournamentMatch(){
+  omb.currentMatch=[omb.pool.pop(),omb.pool.pop()];
+  document.getElementById('ombRoundText').textContent=omb.roundName;
+  document.getElementById('ombProgressText').textContent=`Maç ${omb.matchIndex} / ${omb.matchTotal}`;
+  document.getElementById('ombTextTop').textContent=omb.currentMatch[0];
+  document.getElementById('ombTextBottom').textContent=omb.currentMatch[1];
+  applyRandomOmbColors();
+}
+
+function loadKingMatch(){
+  let challenger=omb.pool.pop();
+  omb.currentMatch=[omb.kingChamp,challenger];
+  document.getElementById('ombRoundText').textContent="KRAL MODU 👑";
+  document.getElementById('ombProgressText').textContent=`Kalan Seçenek: ${omb.pool.length}`;
+  document.getElementById('ombTextTop').textContent=omb.currentMatch[0];
+  document.getElementById('ombTextBottom').textContent=omb.currentMatch[1];
+  applyRandomOmbColors();
+}
+
+function handleOmbChoice(pickIndex){
+  let winnerText=omb.currentMatch[pickIndex];
+  playSoundCardFlip();
+  if(omb.mode==='tournament'){
+    omb.nextPool.push(winnerText);
+    omb.matchIndex++;
+    if(omb.pool.length===0){
+      if(omb.nextPool.length===1) showOmbResult(omb.nextPool[0]);
+      else{
+        omb.pool=omb.nextPool.sort(()=>Math.random()-.5);
+        omb.nextPool=[];
+        prepareTournamentRound();
+      }
+    } else loadTournamentMatch();
+  } else {
+    omb.kingChamp=winnerText;
+    if(omb.pool.length===0) showOmbResult(omb.kingChamp);
+    else loadKingMatch();
+  }
+}
+
+function showOmbResult(winnerText){
+  document.getElementById('ombWinnerText').textContent=winnerText;
+  showScreen('screen-omb-result');
+  setTimeout(()=>launchConfetti(),300);
+}
+
+/* ══════════════ WAVELENGTH OYUNU ══════════════ */
+let isDraggingWave = false;
+let waveGuessAngle = 90; // İbre ortada başlar (90 derece)
+
+function startWave() {
+  st.wave.pool = [...WAVE_DATA].sort(()=>Math.random()-.5);
+  st.wave.score = 0;
+  st.wave.round = 1;
+  nextWaveRound();
+  showScreen('screen-wave');
+}
+
+function nextWaveRound() {
+  if(st.wave.pool.length === 0) {
+    st.wave.pool = [...WAVE_DATA].sort(()=>Math.random()-.5);
+  }
+  const item = st.wave.pool.pop();
+  document.getElementById('waveLeft').textContent = item.left;
+  document.getElementById('waveRight').textContent = item.right;
+
+  // Hedef açısı 25 ile 155 derece arası rastgele (uçlara çok yapışmasın)
+  st.wave.targetAngle = Math.floor(Math.random() * 131) + 25;
+  
+  // İbreyi sıfırla (Ortaya)
+  waveGuessAngle = 90;
+  document.getElementById('waveNeedle').style.transform = `rotate(0deg)`; // 90-90 = 0 (Dik)
+  
+  // Hedefi gizle ve pozisyonunu ayarla
+  document.getElementById('waveTargetWedge').style.opacity = '0';
+  document.getElementById('waveTargetWedge').style.transform = `rotate(${st.wave.targetAngle - 90}deg)`;
+
+  document.getElementById('waveScoreText').textContent = `Tur: ${st.wave.round} | Skor: ${st.wave.score}`;
+  
+  document.getElementById('waveTargetArea').style.display = 'block';
+  document.getElementById('btnWaveReveal').style.display = 'inline-block';
+  document.getElementById('waveClueHint').style.display = 'none';
+  document.getElementById('btnWaveHide').style.display = 'none';
+
+  document.getElementById('waveGuessArea').style.display = 'none';
+  document.getElementById('waveResultArea').style.display = 'none';
+  
+  // Takım sırası gelene kadar ibreye dokunmayı kilitle
+  document.getElementById('waveDialContainer').style.pointerEvents = 'none';
+}
+
+function revealWaveTarget() {
+  document.getElementById('btnWaveReveal').style.display = 'none';
+  document.getElementById('waveTargetWedge').style.opacity = '1';
+  document.getElementById('waveClueHint').style.display = 'block';
+  document.getElementById('btnWaveHide').style.display = 'inline-block';
+}
+
+function hideWaveTarget() {
+  document.getElementById('waveTargetWedge').style.opacity = '0';
+  document.getElementById('waveTargetArea').style.display = 'none';
+  document.getElementById('waveGuessArea').style.display = 'flex';
+  // İbreyi aktif et
+  document.getElementById('waveDialContainer').style.pointerEvents = 'auto';
+  document.getElementById('waveDialContainer').style.cursor = 'ew-resize';
+}
+
+// İbreyi fare/parmak ile hareket ettirme matematiği
+function setNeedleAngle(e) {
+  if(!isDraggingWave) return;
+  const dial = document.getElementById('waveDialContainer');
+  let rect = dial.getBoundingClientRect();
+  let centerX = rect.left + rect.width / 2;
+  let centerY = rect.top + rect.height; // alt orta merkez
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  let dx = clientX - centerX;
+  let dy = centerY - clientY;
+
+  let angleRad = Math.atan2(dy, dx);
+  let angleDeg = angleRad * 180 / Math.PI;
+
+  // 0 (En Sol) ile 180 (En Sağ) arası sınırlandırma
+  let mappedAngle = 180 - angleDeg;
+  if (mappedAngle < 0) mappedAngle = 0;
+  if (mappedAngle > 180) mappedAngle = 180;
+
+  waveGuessAngle = mappedAngle;
+  // CSS transform için hesap (0 derece tam yukarı bakar. Sol: -90, Sağ: +90)
+  document.getElementById('waveNeedle').style.transform = `rotate(${waveGuessAngle - 90}deg)`;
+}
+
+// Dokunmatik ve Mouse Eventleri
+const waveDial = document.getElementById('waveDialContainer');
+waveDial.addEventListener('mousedown', (e) => { isDraggingWave = true; setNeedleAngle(e); });
+document.addEventListener('mousemove', setNeedleAngle);
+document.addEventListener('mouseup', () => { isDraggingWave = false; });
+
+waveDial.addEventListener('touchstart', (e) => { isDraggingWave = true; setNeedleAngle(e); }, {passive:false});
+document.addEventListener('touchmove', (e) => { if(isDraggingWave) { e.preventDefault(); setNeedleAngle(e); } }, {passive:false});
+document.addEventListener('touchend', () => { isDraggingWave = false; });
+
+function submitWaveGuess() {
+  // Cevap kilitlenince ibreyi oynamayı kapat
+  document.getElementById('waveDialContainer').style.pointerEvents = 'none';
+  // Arkadaki gizli hedefi göster
+  document.getElementById('waveTargetWedge').style.opacity = '1';
+
+  // Gerçek hedef ile tahmin edilen açı farkı
+  const diff = Math.abs(st.wave.targetAngle - waveGuessAngle);
+  let pts = 0;
+  let msg = "";
+  let col = "#ff6b6b"; 
+
+  // Puanlama: ±5 derece (4 Puan), ±15 derece (3 Puan), ±25 derece (2 Puan)
+  if(diff <= 5) { pts = 4; msg = "Tam İsabet! 🎯"; col = "#22c55e"; playSoundCorrect(); launchConfetti();}
+  else if(diff <= 15) { pts = 3; msg = "Harika! 🔥"; col = "#ffd93d"; playSoundCorrect(); }
+  else if(diff <= 25) { pts = 2; msg = "Fena Değil 👍"; col = "#f59e0b"; playSoundCorrect(); }
+  else { pts = 0; msg = "Karavana 🥶"; col = "#ef4444"; playSoundWrong(); }
+
+  st.wave.score += pts;
+
+  document.getElementById('waveGuessArea').style.display = 'none';
+  document.getElementById('wavePts').innerHTML = `${msg} <br> <span style="font-size:24px; color:rgba(255,255,255,.6);">+${pts} Puan</span>`;
+  document.getElementById('wavePts').style.color = col;
+
+  document.getElementById('waveResultArea').style.display = 'flex';
+  st.wave.round++;
+}
+
+/* ══════════════ SCOREBOARD ══════════════ */
+function renderScoreboard(){
+  const arr=(st.game==='tabu'?st.tabu.teams.map(t=>({name:t.name,v:t.score}))
+    :st.players.map(p=>({name:p,v:st.scores[p]||0}))).sort((a,b)=>b.v-a.v);
+  const label=st.game==='bottle'?'tur':st.game==='tabu'?'puan':'oy';
+  document.getElementById('scoreList').innerHTML=arr.map((p,i)=>`
+    <div class="score-item ${i===0?'top1':''}" style="animation-delay:${i*.07}s">
+      <div class="score-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="score-player">${p.name}</div>
+      <div class="score-votes">${p.v} <span>${label}</span></div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   MERKEZI CLICK HANDLER
+══════════════════════════════════════════ */
+function handleAction(target){
+  const id=target.id;
+  if(id==='btnShowPick'){showPick();return;}
+  if(id==='btnShowScore'){showScore();return;}
+  if(id==='btnPickBack'){showScreen('screen-splash');return;}
+  if(id==='btnPickMlto'){st.game='mlto';showSetup();return;}
+  if(id==='btnPickBottle'){st.game='bottle';showSetup();return;}
+  if(id==='btnPickTabu'){showScreen('screen-tabu-setup');renderTabuPlayers();return;}
+  if(id==='btnPickKimbu'){showKimBu();return;}
+  if(id==='btnPickQuiz'){showQuiz();return;}
+  if(id==='btnPickWave'){startWave();return;} // Wave
+  
+  // Quiz
+  if(id==='btnQuizBack'||id==='btnQuizHome'||id==='btnQuizHomeEnd'){showScreen('screen-splash');return;}
+  if(id==='btnQuizRestart'){showQuiz();return;}
+  if(id==='btnQuizNext'){qz.qIdx++;loadQuizQuestion();return;}
+  if(id==='btnQuizSkip'){quizSkip();return;}
+  if(target.dataset.qseries!==undefined){startQuizSeries(parseInt(target.dataset.qseries));return;}
+  if(target.dataset.qchoice!==undefined){answerQuiz(parseInt(target.dataset.qchoice));return;}
+  
+  // Kim Bu
+  if(id==='btnKbFutbol'){startKimBu('futbolcu');return;}
+  if(id==='btnKbActor'){startKimBu('aktor');return;}
+  if(id==='btnKbTurkFutbol'){startKimBu('turk_futbolcu');return;}
+  if(id==='btnKbTurkActor'){startKimBu('turk_aktor');return;}
+  if(id==='btnKbBack'||id==='btnKbHome2'||id==='btnKbHomeEnd'){showScreen('screen-splash');return;}
+  if(id==='btnKbHint'){kbShowHint();return;}
+  if(id==='btnKbSubmit'){submitKbGuess();return;}
+  if(id==='btnKbSkipQ'){kbSkip();return;}
+  if(id==='btnKbNext'){kbNext();return;}
+  if(id==='btnKbRestart'){showKimBu();return;}
+  
+  // Setup / MLT
+  if(id==='btnSetupBack'){showPick();return;}
+  if(id==='btnStartGame'){startCurrentGame();return;}
+  if(id==='btnAddPlayer'){addPlayer();return;}
+  if(id==='btnGameSetup'||id==='btnBottleSetup'){showSetup();return;}
+  if(id==='modeVote'){setMode('vote');return;}
+  if(id==='modeCard'){setMode('card');return;}
+  if(target.dataset.q){
+    st.qCount=parseInt(target.dataset.q);
+    document.querySelectorAll('#qCountTabs .mode-tab').forEach(t=>t.classList.remove('active'));
+    target.classList.add('active');return;
+  }
+  
+  // Tabu
+  if(id==='btnTabuAddPlayer'){addTabuPlayer();return;}
+  if(id==='btnTabuSetupBack'){showPick();return;}
+  if(id==='btnStartTabu'){startTabu();return;}
+  if(id==='btnTabuNextTurn'){startNextTabuTurn();return;}
+  if(target.dataset.tabuCat){setTabuCategory(target.dataset.tabuCat);return;}
+  if(target.dataset.tabuTime){setTabuTime(target.dataset.tabuTime);return;}
+  if(target.dataset.diff){setDifficulty(target.dataset.diff);return;}
+  if(target.dataset.tabuRemove){removeTabuPlayer(target.dataset.tabuRemove);return;}
+  if(id==='btnTabuCorrect'){tabuCorrect();return;}
+  if(id==='btnTabuSkip'){tabuSkip();return;}
+  if(id==='btnTabuMistake'){tabuMistake();return;}
+  if(id==='btnTabuSetup2'){clearInterval(st.tabu.timerInterval);stopAllTabuSounds();showScreen('screen-tabu-setup');return;}
+  
+  // Card game logic
+  if(id==='mainCard'){flipCard();return;}
+  if(id==='btnNextCard'){nextCard();return;}
+  if(target.dataset.vote){vote(target.dataset.vote,target);return;}
+  if(target.dataset.pick){pickPlayer(target.dataset.pick,target);return;}
+  if(target.dataset.remove){removePlayer(target.dataset.remove);return;}
+  
+  // Bottle logic
+  if(id==='spinBtn'||id==='bottleWrap'||target.closest('#bottleWrap')){spinBottle();return;}
+  if(id==='btnBottleScore'){showScore();return;}
+  if(target.dataset.choice){revealChallenge(target.dataset.winner,target.dataset.choice==='truth');return;}
+  
+  if(id==='btnReplay'){startCurrentGame();return;}
+  if(id==='btnScoreHome'){showScreen('screen-splash');return;}
+  
+  // OMB
+  if(id==='btnPickOmuBumu'){showOmbSetup();return;}
+  if(id==='btnOmbSetupBack'){showPick();return;}
+  if(target.dataset.ombCat){
+    omb.cat=target.dataset.ombCat;
+    document.querySelectorAll('[data-omb-cat]').forEach(b=>b.classList.toggle('active',b.dataset.ombCat===omb.cat));
+    return;
+  }
+  if(target.dataset.ombMode){updateOmbModeHint(target.dataset.ombMode);return;}
+  if(target.dataset.ombCount){
+    omb.totalCount=parseInt(target.dataset.ombCount);
+    document.querySelectorAll('[data-omb-count]').forEach(b=>b.classList.toggle('active',b.dataset.ombCount===target.dataset.ombCount));
+    return;
+  }
+  if(id==='btnStartOmuBumu'){startOmbGame();return;}
+  if(id==='btnOmbTop'||target.closest('#btnOmbTop')){handleOmbChoice(0);return;}
+  if(id==='btnOmbBottom'||target.closest('#btnOmbBottom')){handleOmbChoice(1);return;}
+  if(id==='btnOmbQuit'){showPick();return;}
+  if(id==='btnOmbReplay'){showOmbSetup();return;}
+  if(id==='btnOmbHome'){showScreen('screen-splash');return;}
+
+  // Wave Logic
+  if(id==='btnWaveReveal'){revealWaveTarget();return;}
+  if(id==='btnWaveHide'){hideWaveTarget();return;}
+  if(id==='btnWaveSubmit'){submitWaveGuess();return;}
+  if(id==='btnWaveNext'){nextWaveRound();return;}
+  if(id==='btnWaveHome'){showScreen('screen-splash');return;}
+}
+
+document.addEventListener('click', function(e) {
+  let t = e.target;
+  for(let i = 0; i < 5; i++){
+    if(!t || t === document.body) break;
+    const isBtn  = t.tagName === 'BUTTON';
+    const isCard = t.id === 'mainCard' || t.id === 'bottleWrap';
+    const isOmb  = t.classList && t.classList.contains('omb-card');
+    const isTab  = t.classList && t.classList.contains('mode-tab');
+    if(isBtn || isCard || isOmb || isTab){
+      e.preventDefault();
+      handleAction(t);
+      return;
+    }
+    t = t.parentElement;
+  }
+});
+
+document.getElementById('playerInput').addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer();});
+document.getElementById('tabuPlayerInput').addEventListener('keydown',e=>{if(e.key==='Enter')addTabuPlayer();});
+document.getElementById('kbInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitKbGuess();});
+</script>
+</body>
+</html>
