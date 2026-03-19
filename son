@@ -1,0 +1,18 @@
+function startQuizSeries(idx){
+  const series = QUIZ_DATA[idx];
+  qz.seriesIdx = idx;
+  
+  // DİKKAT: .sort(()=>Math.random()-.5) KISMINI KALDIRDIK!
+  // Artık sorular kolaydan zora (yazıldığı sırayla) gelecek.
+  qz.questions = [...series.questions]; 
+  
+  qz.qIdx = 0; qz.score = 0; qz.answered = false; qz.bestStreak = 0; qz.currentStreak = 0;
+  
+  document.getElementById('quizSeriesLabel').textContent = series.emoji+' '+series.name;
+  document.getElementById('quizProgBar').style.background = series.color;
+  document.getElementById('quizSeriesPick').style.display='none';
+  document.getElementById('quizGameArea').style.display='flex';
+  document.getElementById('quizResultArea').style.display='none';
+  
+  loadQuizQuestion();
+}
