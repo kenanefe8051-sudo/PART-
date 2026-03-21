@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Wavelength 〰️</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; touch-action: manipulation; }
+
+:root {
+  --bg: #050810;
+  --surface: #0d1120;
+  --border: rgba(99,220,220,.12);
+  --accent: #3BFFD8;
+  --accent2: #FF4ECD;
+  --text: #e8f4f4;
+  --muted: rgba(232,244,244,.4);
+  --glow: rgba(59,255,216,.25);
+  --glow2: rgba(255,78,205,.2);
+}
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(59,255,216,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,255,216,.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridDrift 20s linear infinite;
+}
+@keyframes gridDrift { from { background-position: 0 0; } to { background-position: 50px 50px; } }
+
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(59,255,216,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 80% 70%, rgba(255,78,205,.07) 0%, transparent 70%);
+}
+
+/* ── SCREENS ── */
+.screen {
+  display: none; width: 100%; max-width: 480px;
+  min-height: 100vh; padding: 28px 22px;
+  flex-direction: column; align-items: center; justify-content: center;
+  position: relative; z-index: 1; gap: 20px;
+}
+.screen.active { display: flex; }
+
+/* ── SPLASH ── */
+#splash {
+  text-align: center;
+  gap: 0;
+}
+
+.splash-logo {
+  font-size: 72px;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 24px var(--accent));
+  animation: floatLogo 3s ease-in-out infinite;
+}
+@keyframes floatLogo {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+.splash-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(36px, 10vw, 56px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, var(--accent), #7DF9FF, var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.splash-sub {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+  font-family: 'Space Mono', monospace;
+}
+
+.splash-desc {
+  font-size: 14px;
+  color: rgba(232,244,244,.6);
+  line-height: 1.7;
+  max-width: 320px;
+  margin: 0 auto 36px;
+  background: rgba(59,255,216,.05);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+}
+
+.splash-desc b { color: var(--accent); }
+
+/* ── BUTTONS ── */
+.btn {
+  width: 100%; padding: 16px 22px;
+  border: none; border-radius: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; touch-action: manipulation;
+  -webkit-appearance: none; transition: all .18s;
+  letter-spacing: 1px;
+}
+.btn:active { transform: scale(.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #00b8a0);
+  color: #050810;
+  box-shadow: 0 0 30px rgba(59,255,216,.3);
+}
+.btn-primary:hover { box-shadow: 0 0 40px rgba(59,255,216,.5); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid rgba(232,244,244,.12);
+  font-size: 13px;
+}
+.btn-secondary:hover { border-color: var(--border); color: var(--text); }
+
+.btn-ghost {
+  background: transparent; color: var(--muted);
+  font-size: 12px; padding: 10px;
+  border: none;
+}
+
+.btn-sm {
+  width: auto; padding: 10px 18px;
+  font-size: 12px; border-radius: 10px;
+}
+
+.btn-pink {
+  background: linear-gradient(135deg, var(--accent2), #c026d3);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(255,78,205,.3);
+}
+
+/* ── SETUP ── */
+#setup { gap: 16px; justify-content: flex-start; padding-top: 50px; }
+
+.setup-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent);
+  align-self: flex-start;
+  margin-bottom: -6px;
+}
+
+.team-inputs { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+
+.team-input-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 14px 16px;
+}
+
+.team-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+input[type=text], input[type=number] {
+  flex: 1; background: transparent; border: none;
+  color: var(--text); font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 600; outline: none;
+}
+input::placeholder { color: rgba(232,244,244,.2); }
+
+.rounds-row { display: flex; gap: 8px; width: 100%; }
+.round-btn {
+  flex: 1; padding: 12px 8px; border: 1.5px solid var(--border);
+  border-radius: 10px; background: transparent;
+  font-family: 'Space Mono', monospace;
+  font-size: 14px; font-weight: 700;
+  color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.round-btn.active {
+  background: rgba(59,255,216,.12);
+  border-color: var(--accent); color: var(--accent);
+}
+
+.divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* ── GAME SCREEN ── */
+#game { gap: 0; justify-content: flex-start; padding-top: 22px; padding-bottom: 24px; }
+
+.game-top {
+  width: 100%; display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 14px;
+}
+
+.round-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase;
+}
+
+.scores-row {
+  display: flex; gap: 8px; width: 100%; margin-bottom: 14px;
+}
+
+.score-card {
+  flex: 1; border-radius: 14px; padding: 12px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  transition: all .3s;
+}
+.score-card.active {
+  background: rgba(59,255,216,.08);
+  border-color: rgba(59,255,216,.4);
+  box-shadow: 0 0 20px rgba(59,255,216,.12);
+}
+.score-card.active-pink {
+  background: rgba(255,78,205,.08);
+  border-color: rgba(255,78,205,.4);
+  box-shadow: 0 0 20px rgba(255,78,205,.12);
+}
+
+.sc-team {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 2px;
+}
+.sc-score {
+  font-family: 'Space Mono', monospace;
+  font-size: 32px; font-weight: 700; line-height: 1;
+}
+.score-card.active .sc-score { color: var(--accent); }
+.score-card.active-pink .sc-score { color: var(--accent2); }
+
+/* Concept bar */
+.concept-bar {
+  width: 100%; display: flex; align-items: center;
+  gap: 10px; margin-bottom: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 14px 16px;
+  position: relative; overflow: hidden;
+}
+.concept-bar::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(255,107,107,.06), transparent 40%, transparent 60%, rgba(77,150,255,.06));
+  pointer-events: none;
+}
+
+.concept-word {
+  font-family: 'Space Mono', monospace;
+  font-size: 16px; font-weight: 700;
+  flex: 1;
+}
+.concept-left { color: #FF8A8A; text-align: left; }
+.concept-right { color: #7AADFF; text-align: right; }
+.concept-sep { color: var(--muted); font-size: 18px; flex-shrink: 0; }
+
+/* Dial */
+.dial-wrap {
+  width: 100%; position: relative; margin: 4px 0;
+}
+#dialCanvas {
+  width: 100%; display: block;
+  border-radius: 16px;
+  cursor: pointer; touch-action: none;
+}
+
+/* Phase indicator */
+.phase-strip {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 9px 16px;
+  font-size: 12px; font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+}
+.phase-strip span { color: var(--accent); }
+.phase-strip span.pink { color: var(--accent2); }
+
+/* Clue box */
+.clue-box {
+  width: 100%;
+  background: rgba(59,255,216,.06);
+  border: 1.5px solid rgba(59,255,216,.25);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: all .3s;
+}
+.clue-box.pink-mode {
+  background: rgba(255,78,205,.06);
+  border-color: rgba(255,78,205,.25);
+}
+
+.clue-label {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--accent);
+}
+.clue-box.pink-mode .clue-label { color: var(--accent2); }
+
+.clue-input {
+  background: rgba(255,255,255,.07);
+  border: 1.5px solid rgba(255,255,255,.1);
+  border-radius: 10px; padding: 11px 14px;
+  color: var(--text);
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600;
+  outline: none; width: 100%; transition: border-color .2s;
+}
+.clue-input:focus { border-color: rgba(59,255,216,.5); }
+
+.clue-display {
+  font-family: 'Space Mono', monospace;
+  font-size: 24px; font-weight: 700;
+  color: var(--accent); text-align: center;
+  letter-spacing: 1px;
+  padding: 4px 0;
+}
+
+/* Result banner */
+.result-banner {
+  width: 100%; border-radius: 14px;
+  padding: 14px 18px; text-align: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 1px;
+  animation: bannerIn .4s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes bannerIn { from { opacity:0; transform:scale(.9); } to { opacity:1; transform:scale(1); } }
+
+.res-4 { background: rgba(34,197,94,.15); border: 1.5px solid rgba(34,197,94,.4); color: #4ade80; }
+.res-3 { background: rgba(59,255,216,.12); border: 1.5px solid rgba(59,255,216,.35); color: var(--accent); }
+.res-2 { background: rgba(251,191,36,.12); border: 1.5px solid rgba(251,191,36,.35); color: #fbbf24; }
+.res-1 { background: rgba(249,115,22,.12); border: 1.5px solid rgba(249,115,22,.35); color: #fb923c; }
+.res-0 { background: rgba(239,68,68,.12); border: 1.5px solid rgba(239,68,68,.35); color: #f87171; }
+
+.game-actions { display: flex; gap: 8px; width: 100%; margin-top: 6px; }
+
+/* ── RESULT SCREEN ── */
+#result-screen { text-align: center; gap: 16px; }
+
+.winner-badge {
+  font-size: 72px;
+  animation: floatLogo 2s ease-in-out infinite;
+}
+.winner-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--muted);
+}
+.winner-name {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(28px, 8vw, 42px);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin: 4px 0 16px;
+}
+
+.final-scores {
+  width: 100%; display: flex; flex-direction: column; gap: 8px;
+}
+.fs-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 14px 18px;
+}
+.fs-row.winner-row {
+  background: rgba(59,255,216,.08);
+  border-color: rgba(59,255,216,.35);
+}
+.fs-name { font-weight: 700; font-size: 15px; }
+.fs-score {
+  font-family: 'Space Mono', monospace;
+  font-size: 24px; font-weight: 700;
+  color: var(--accent);
+}
+
+/* Confetti */
+#confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* How-to steps */
+.how-to {
+  width: 100%;
+  display: flex; flex-direction: column; gap: 8px;
+  margin: 4px 0;
+}
+.how-step {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.how-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  color: var(--accent);
+  background: rgba(59,255,216,.12);
+  border-radius: 6px; padding: 2px 7px;
+  flex-shrink: 0; margin-top: 1px;
+}
+.how-text { font-size: 13px; color: rgba(232,244,244,.7); line-height: 1.5; }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<!-- ══ SPLASH ══ -->
+<div id="splash" class="screen active">
+  <div class="splash-logo">〰️</div>
+  <div class="splash-title">WAVELENGTH</div>
+  <div class="splash-sub">Frekansını bul</div>
+
+  <div class="how-to">
+    <div class="how-step">
+      <span class="how-num">01</span>
+      <div class="how-text">Bir kavram çifti belirir: <b style="color:#FF8A8A">Sıcak</b> ↔ <b style="color:#7AADFF">Soğuk</b> gibi.</div>
+    </div>
+    <div class="how-step">
+      <span class="how-num">02</span>
+      <div class="how-text"><b style="color:var(--accent)">İpucu veren takım</b> kadrandaki parlak hedef bölgeyi görür — diğer takım bakamaz!</div>
+    </div>
+    <div class="how-step">
+      <span class="how-num">03</span>
+      <div class="how-text">Hedef gizlenir. İpucu veren, konuma uygun <b style="color:var(--accent)">tek kelime</b> ipucu verir.</div>
+    </div>
+    <div class="how-step">
+      <span class="how-num">04</span>
+      <div class="how-text"><b style="color:var(--accent2)">Diğer takım</b> ibreyi çevirerek o kelimeye göre tahminde bulunur. Ne kadar yakın = o kadar puan! 🎯</div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="btnGoSetup">OYUNU BAŞLAT →</button>
+</div>
+
+<!-- ══ SETUP ══ -->
+<div id="setup" class="screen">
+  <div class="splash-title" style="font-size:32px;align-self:flex-start;margin-bottom:-8px;">Kurulum</div>
+
+  <div class="setup-title">Takım İsimleri</div>
+  <div class="team-inputs">
+    <div class="team-input-row">
+      <div class="team-color-dot" style="background:var(--accent)"></div>
+      <input type="text" id="team1Input" placeholder="Takım 1" maxlength="18" value="Takım 1">
+    </div>
+    <div class="team-input-row">
+      <div class="team-color-dot" style="background:var(--accent2)"></div>
+      <input type="text" id="team2Input" placeholder="Takım 2" maxlength="18" value="Takım 2">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="setup-title">Kaç Tur?</div>
+  <div class="rounds-row">
+    <button class="round-btn" data-rounds="5">5</button>
+    <button class="round-btn active" data-rounds="10">10</button>
+    <button class="round-btn" data-rounds="15">15</button>
+    <button class="round-btn" data-rounds="20">20</button>
+  </div>
+
+  <button class="btn btn-primary" id="btnStartGame" style="margin-top:8px;">BAŞLAT →</button>
+  <button class="btn btn-ghost" id="btnSetupBack">← Geri</button>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="game" class="screen">
+  <div class="game-top">
+    <div class="round-badge" id="roundBadge">TUR 1 / 10</div>
+    <button class="btn btn-ghost btn-sm" id="btnGameHome" style="padding:6px 10px;">🏠</button>
+  </div>
+
+  <div class="scores-row">
+    <div class="score-card" id="sc0">
+      <div class="sc-team" id="scName0">TAKIM 1</div>
+      <div class="sc-score" id="scScore0">0</div>
+    </div>
+    <div class="score-card" id="sc1">
+      <div class="sc-team" id="scName1">TAKIM 2</div>
+      <div class="sc-score" id="scScore1">0</div>
+    </div>
+  </div>
+
+  <div class="concept-bar">
+    <div class="concept-word concept-left" id="conceptLeft">SICAK</div>
+    <div class="concept-sep">↔</div>
+    <div class="concept-word concept-right" id="conceptRight">SOĞUK</div>
+  </div>
+
+  <div class="dial-wrap">
+    <canvas id="dialCanvas" height="170"></canvas>
+  </div>
+
+  <div class="phase-strip" id="phaseStrip">Aşama: <span id="phaseLabel">İpucu Ver</span></div>
+
+  <div class="clue-box" id="clueBox">
+    <div class="clue-label" id="clueBoxLabel">İPUCUNU YAZ (1 KELİME)</div>
+    <input class="clue-input" id="clueInput" placeholder="Kelime ipucu..." maxlength="30" autocomplete="off">
+  </div>
+
+  <div id="resultBanner" style="display:none"></div>
+
+  <div class="game-actions">
+    <button class="btn btn-ghost btn-sm" style="flex:0;padding:12px 14px;" id="btnGameBack2">⚙️</button>
+    <button class="btn btn-primary btn-sm" id="btnAction" style="flex:1;font-size:13px;">İPUCU KİLİTLE 🔒</button>
+  </div>
+</div>
+
+<!-- ══ RESULT ══ -->
+<div id="result-screen" class="screen">
+  <div class="winner-badge" id="winnerEmoji">🏆</div>
+  <div class="winner-title">KAZANAN TAKIM</div>
+  <div class="winner-name" id="winnerName">—</div>
+
+  <div class="final-scores" id="finalScores"></div>
+
+  <button class="btn btn-primary" id="btnPlayAgain">TEKRAR OYNA 🔄</button>
+  <button class="btn btn-secondary" id="btnResultHome">← Ana Sayfa</button>
+</div>
+
+<script>
+/* ══ CONCEPTS ══ */
+const CONCEPTS = [
+  ["Sıcak","Soğuk"],["Hızlı","Yavaş"],["Büyük","Küçük"],["Eski","Yeni"],
+  ["Güzel","Çirkin"],["Pahalı","Ucuz"],["Akıllı","Aptal"],["Güçlü","Zayıf"],
+  ["Mutlu","Üzgün"],["Tehlikeli","Güvenli"],["Kolay","Zor"],["Popüler","Yalnız"],
+  ["Sessiz","Gürültülü"],["Temiz","Kirli"],["Tatlı","Acı"],["Genç","Yaşlı"],
+  ["Yumuşak","Sert"],["Aydınlık","Karanlık"],["Heyecanlı","Sıkıcı"],["Doğal","Yapay"],
+  ["Romantik","Soğuk"],["Komik","Ciddi"],["Lüks","Mütevazı"],["Egzotik","Sıradan"],
+  ["Cesur","Korkak"],["Eğlenceli","Sıkıcı"],["Zarif","Kaba"],["İnanılmaz","Sıradan"],
+  ["Nadir","Yaygın"],["Masum","Suçlu"],["Özgür","Bağımlı"],["Enerjik","Yorgun"],
+  ["Şanslı","Şanssız"],["Sakin","Stresli"],["Renkli","Donuk"],["Antik","Modern"],
+  ["Hafif","Ağır"],["Mükemmel","Berbat"],["Yaratıcı","Sıradan"],["Büyülü","Sıradan"],
+  ["Tehlikeli","Masum"],["Saf","Karmaşık"],["Açık","Kapalı"],["İddialı","Mütevazı"],
+  ["Gizemli","Açık"],["Pratik","Romantik"],["Efsanevi","Unutulmuş"],["Maceracı","Yerinde"],
+  ["Korkutucu","Güven verici"],["Çılgın","Mantıklı"],["Sofistike","Kaba"],["Huzurlu","Kaotik"],
+  ["Yenilikçi","Geleneksel"],["Sıradan","Eşsiz"],["Şeffaf","Gizemli"],["Sonsuz","Sınırlı"],
+];
+
+/* ══ STATE ══
+   Faz sırası:
+   'reveal'  → İpucu veren takım hedef bölgeyi kadran üstünde görür
+   'clue'    → Hedef kapanır, ipucu veren kelimesini yazar & kilitler
+   'guess'   → Diğer takım ibreyi çevirerek tahmin eder
+   'result'  → Hedef açılır, puan verilir
+   ══ */
+let state = {
+  teams: [{name:'Takım 1',score:0},{name:'Takım 2',score:0}],
+  clueTeam: 0,   // bu turda ipucu veren takım
+  guessTeam: 1,  // bu turda tahmin eden takım
+  round: 1,
+  totalRounds: 10,
+  targetAngle: 90,
+  needleAngle: 90,
+  concept: null,
+  clue: '',
+  phase: 'reveal', // reveal | clue | guess | result
+  usedConcepts: [],
+  dragging: false,
+};
+
+/* ══ SCREENS ══ */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'game') setTimeout(() => { setupDialEvents(); drawDial(); }, 80);
+}
+
+/* ══ SETUP LOGIC ══ */
+let selectedRounds = 10;
+document.querySelectorAll('[data-rounds]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedRounds = parseInt(btn.dataset.rounds);
+    document.querySelectorAll('[data-rounds]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('btnGoSetup').addEventListener('click', () => show('setup'));
+document.getElementById('btnSetupBack').addEventListener('click', () => show('splash'));
+document.getElementById('btnGameHome').addEventListener('click', () => { if(confirm('Oyundan çıkmak istiyor musun?')) show('splash'); });
+document.getElementById('btnGameBack2').addEventListener('click', () => show('setup'));
+document.getElementById('btnPlayAgain').addEventListener('click', () => show('setup'));
+document.getElementById('btnResultHome').addEventListener('click', () => show('splash'));
+
+document.getElementById('btnStartGame').addEventListener('click', () => {
+  const t1 = document.getElementById('team1Input').value.trim() || 'Takım 1';
+  const t2 = document.getElementById('team2Input').value.trim() || 'Takım 2';
+  state.teams = [{name:t1,score:0},{name:t2,score:0}];
+  state.clueTeam = 0;
+  state.guessTeam = 1;
+  state.round = 1;
+  state.totalRounds = selectedRounds;
+  state.usedConcepts = [];
+  newRound();
+  show('game');
+});
+
+/* ══ GAME LOGIC ══ */
+function pickConcept() {
+  const pool = CONCEPTS.map((_,i) => i).filter(i => !state.usedConcepts.includes(i));
+  const remaining = pool.length > 0 ? pool : CONCEPTS.map((_,i) => i);
+  if (pool.length === 0) state.usedConcepts = [];
+  const idx = remaining[Math.floor(Math.random() * remaining.length)];
+  state.usedConcepts.push(idx);
+  return CONCEPTS[idx];
+}
+
+function newRound() {
+  state.concept = pickConcept();
+  state.targetAngle = 15 + Math.random() * 150;
+  state.needleAngle = 90;
+  state.clue = '';
+  state.phase = 'reveal';
+  renderGame();
+}
+
+function renderGame() {
+  const t = state.teams;
+  const ct = state.clueTeam;
+  const gt = state.guessTeam;
+
+  // Round
+  document.getElementById('roundBadge').textContent = `TUR ${state.round} / ${state.totalRounds}`;
+
+  // Scores — clue team highlighted in reveal/clue, guess team in guess
+  ['sc0','sc1'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    let cls = 'score-card';
+    if (state.phase === 'guess' || state.phase === 'result') {
+      if (i === gt) cls += (i === 0 ? ' active' : ' active-pink');
+    } else {
+      if (i === ct) cls += (i === 0 ? ' active' : ' active-pink');
+    }
+    el.className = cls;
+    document.getElementById('scName'+i).textContent = t[i].name.toUpperCase();
+    document.getElementById('scScore'+i).textContent = t[i].score;
+  });
+
+  // Concept
+  document.getElementById('conceptLeft').textContent = state.concept[0];
+  document.getElementById('conceptRight').textContent = state.concept[1];
+
+  // Phase strip
+  const phaseLabel = document.getElementById('phaseLabel');
+  const clueIsT0 = ct === 0;
+  const guessIsT0 = gt === 0;
+
+  if (state.phase === 'reveal') {
+    phaseLabel.className = clueIsT0 ? '' : 'pink';
+    phaseLabel.textContent = `${t[ct].name} hedefi görüyor — İpucu hazırla`;
+  } else if (state.phase === 'clue') {
+    phaseLabel.className = clueIsT0 ? '' : 'pink';
+    phaseLabel.textContent = `${t[ct].name} — İpucu Veriyor`;
+  } else if (state.phase === 'guess') {
+    phaseLabel.className = guessIsT0 ? '' : 'pink';
+    phaseLabel.textContent = `${t[gt].name} — Tahmin Ediyor`;
+  } else {
+    phaseLabel.className = '';
+    phaseLabel.textContent = `Sonuç!`;
+  }
+
+  // Clue box
+  const clueBox = document.getElementById('clueBox');
+  const inp = document.getElementById('clueInput');
+  const label = document.getElementById('clueBoxLabel');
+
+  // Remove old display div if present
+  const existingDisplay = clueBox.querySelector('.clue-display');
+  if (existingDisplay) existingDisplay.remove();
+
+  if (state.phase === 'reveal') {
+    // Show a hint box explaining what to do, but NO clue input yet
+    clueBox.className = 'clue-box' + (clueIsT0 ? '' : ' pink-mode');
+    clueBox.style.display = 'flex';
+    label.textContent = 'HEDEFİ GÖR — İPUCU HAZIRLA';
+    inp.style.display = 'none';
+    let infoDiv = clueBox.querySelector('.reveal-info');
+    if (!infoDiv) { infoDiv = document.createElement('div'); infoDiv.className = 'reveal-info'; clueBox.appendChild(infoDiv); }
+    infoDiv.style.cssText = 'font-size:13px;color:rgba(232,244,244,.6);line-height:1.6;text-align:center;padding:4px 0;';
+    infoDiv.innerHTML = `Parlak bölge <b style="color:var(--accent)">hedef alandır</b>.<br>Diğer takım odadan çıksın, <br>sen bu konuma uygun bir <b style="color:${clueIsT0?'var(--accent)':'var(--accent2)'}">${state.concept[0]} ↔ ${state.concept[1]}</b><br>ipucu düşün.`;
+  } else {
+    const oldInfo = clueBox.querySelector('.reveal-info');
+    if (oldInfo) oldInfo.remove();
+  }
+
+  if (state.phase === 'clue') {
+    clueBox.className = 'clue-box' + (clueIsT0 ? '' : ' pink-mode');
+    clueBox.style.display = 'flex';
+    label.textContent = 'İPUCUNU YAZ (1 KELİME)';
+    inp.style.display = 'block';
+    inp.value = state.clue;
+    inp.disabled = false;
+    setTimeout(() => inp.focus(), 100);
+  } else if (state.phase === 'guess') {
+    clueBox.className = 'clue-box' + (guessIsT0 ? '' : ' pink-mode');
+    clueBox.style.display = 'flex';
+    label.textContent = 'VERİLEN İPUCU';
+    inp.style.display = 'none';
+    let showDiv = document.createElement('div');
+    showDiv.className = 'clue-display';
+    showDiv.textContent = state.clue || '—';
+    showDiv.style.color = guessIsT0 ? 'var(--accent)' : 'var(--accent2)';
+    clueBox.appendChild(showDiv);
+  } else if (state.phase === 'result') {
+    clueBox.style.display = 'none';
+  }
+
+  // Result banner hide on non-result phases
+  if (state.phase !== 'result') {
+    document.getElementById('resultBanner').style.display = 'none';
+  }
+
+  // Action button
+  const btn = document.getElementById('btnAction');
+  btn.style.flex = '1';
+  btn.style.fontSize = '13px';
+  if (state.phase === 'reveal') {
+    btn.textContent = 'HAZIR — İPUCU GİR →';
+    btn.className = 'btn btn-sm' + (clueIsT0 ? ' btn-primary' : ' btn-pink');
+  } else if (state.phase === 'clue') {
+    btn.textContent = 'İPUCU KİLİTLE 🔒';
+    btn.className = 'btn btn-sm' + (clueIsT0 ? ' btn-primary' : ' btn-pink');
+  } else if (state.phase === 'guess') {
+    btn.textContent = 'TAHMİN ET ✓';
+    btn.className = 'btn btn-sm' + (guessIsT0 ? ' btn-primary' : ' btn-pink');
+  } else {
+    btn.textContent = state.round >= state.totalRounds ? 'OYUNU BİTİR 🏁' : 'SONRAKİ TUR →';
+    btn.className = 'btn btn-primary btn-sm';
+  }
+
+  drawDial();
+}
+
+document.getElementById('btnAction').addEventListener('click', handleAction);
+document.getElementById('clueInput').addEventListener('keydown', e => { if(e.key === 'Enter') handleAction(); });
+
+function handleAction() {
+  if (state.phase === 'reveal') {
+    // Target seen, now enter clue phase (target hidden)
+    state.phase = 'clue';
+    renderGame();
+
+  } else if (state.phase === 'clue') {
+    const inp = document.getElementById('clueInput').value.trim();
+    if (!inp) { flashInput(); return; }
+    state.clue = inp;
+    state.needleAngle = 90; // reset needle to center for guessing team
+    state.phase = 'guess';
+    renderGame();
+
+  } else if (state.phase === 'guess') {
+    state.phase = 'result';
+    const diff = Math.abs(state.needleAngle - state.targetAngle);
+    let pts = 0;
+    if (diff <= 4) pts = 4;
+    else if (diff <= 9) pts = 3;
+    else if (diff <= 16) pts = 2;
+    else if (diff <= 24) pts = 1;
+    state.teams[state.guessTeam].score += pts;
+    renderGame();
+    // Show result banner
+    const banner = document.getElementById('resultBanner');
+    banner.style.display = 'block';
+    const msgs = {
+      4: '🎯 TAM 12! +4 PUAN',
+      3: '✦ ÇOK YAKIN! +3 PUAN',
+      2: '~ YAKIN! +2 PUAN',
+      1: '△ AZ KALDI! +1 PUAN',
+      0: '✕ ISKALADIN! 0 PUAN'
+    };
+    banner.textContent = msgs[pts];
+    banner.className = 'result-banner res-' + pts;
+    if (pts >= 3) { playSuccess(); launchConfetti(); }
+    else if (pts === 0) playFail();
+    else playOk();
+    drawDial();
+
+  } else {
+    // Next round or end
+    if (state.round >= state.totalRounds) {
+      showResult();
+    } else {
+      state.round++;
+      // Swap roles each round
+      const tmp = state.clueTeam;
+      state.clueTeam = state.guessTeam;
+      state.guessTeam = tmp;
+      newRound();
+    }
+  }
+}
+
+function flashInput() {
+  const inp = document.getElementById('clueInput');
+  inp.style.borderColor = 'rgba(255,78,205,.6)';
+  inp.placeholder = 'Bir kelime yaz!';
+  setTimeout(() => { inp.style.borderColor = ''; inp.placeholder = 'Kelime ipucu...'; }, 1000);
+}
+
+function showResult() {
+  const sorted = [...state.teams].sort((a,b) => b.score - a.score);
+  const winner = sorted[0];
+  const isDraw = state.teams[0].score === state.teams[1].score;
+
+  document.getElementById('winnerEmoji').textContent = isDraw ? '🤝' : '🏆';
+  document.getElementById('winnerName').textContent = isDraw ? 'BERABERE!' : winner.name.toUpperCase();
+
+  document.getElementById('finalScores').innerHTML = sorted.map((t, i) => `
+    <div class="fs-row ${i === 0 && !isDraw ? 'winner-row' : ''}">
+      <span class="fs-name">${t.name}</span>
+      <span class="fs-score" style="color:${i===0&&!isDraw?'var(--accent)':'var(--muted)'}">${t.score}</span>
+    </div>`).join('');
+
+  show('result-screen');
+  setTimeout(() => launchConfetti(), 200);
+}
+
+/* ══ DIAL DRAWING ══ */
+function drawDial() {
+  const canvas = document.getElementById('dialCanvas');
+  const W = canvas.offsetWidth || 420;
+  canvas.width = W;
+  canvas.height = 170;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, 170);
+  const cx = W / 2, cy = 162, r = 148;
+
+  // Arc track background
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(255,255,255,.06)';
+  ctx.lineWidth = 32;
+  ctx.stroke();
+
+  // Gradient arc track
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, 'rgba(255,138,138,.15)');
+  grad.addColorStop(0.5, 'rgba(59,255,216,.08)');
+  grad.addColorStop(1, 'rgba(122,173,255,.15)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI, 2 * Math.PI);
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 32;
+  ctx.stroke();
+
+  // Show target zones in 'reveal' and 'result' phases only
+  const showTarget = state.phase === 'reveal' || state.phase === 'result';
+  if (showTarget) {
+    const zones = [
+      { spread:50, color:'rgba(249,115,22,.2)' },
+      { spread:32, color:'rgba(251,191,36,.3)' },
+      { spread:18, color:'rgba(59,255,216,.4)' },
+      { spread:8,  color:'rgba(59,255,216,.85)' },
+    ];
+    zones.forEach(z => {
+      const a1 = Math.PI + (state.targetAngle - z.spread/2) / 180 * Math.PI;
+      const a2 = Math.PI + (state.targetAngle + z.spread/2) / 180 * Math.PI;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, a1, a2);
+      ctx.strokeStyle = z.color;
+      ctx.lineWidth = 32;
+      ctx.stroke();
+    });
+    // Target center line
+    const ta = Math.PI + state.targetAngle / 180 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(ta) * (r - 22), cy + Math.sin(ta) * (r - 22));
+    ctx.lineTo(cx + Math.cos(ta) * (r + 6), cy + Math.sin(ta) * (r + 6));
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.stroke();
+    // Target glow dot
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(ta) * r, cy + Math.sin(ta) * r, 9, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(255,255,255,.3)';
+    ctx.shadowColor = '#3BFFD8'; ctx.shadowBlur = 16;
+    ctx.fill(); ctx.shadowBlur = 0;
+    // "HEDEF" label in reveal phase
+    if (state.phase === 'reveal') {
+      const lx = cx + Math.cos(ta) * (r - 52);
+      const ly = cy + Math.sin(ta) * (r - 52);
+      ctx.font = 'bold 10px "Space Mono", monospace';
+      ctx.fillStyle = 'rgba(59,255,216,.9)';
+      ctx.textAlign = 'center';
+      ctx.fillText('HEDEF', lx, ly);
+    }
+  }
+
+  // Tick marks
+  for (let i = 0; i <= 18; i++) {
+    const a = Math.PI + (i / 18) * Math.PI;
+    const len = i % 3 === 0 ? 14 : 7;
+    const rOuter = r + 18;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * rOuter, cy + Math.sin(a) * rOuter);
+    ctx.lineTo(cx + Math.cos(a) * (rOuter - len), cy + Math.sin(a) * (rOuter - len));
+    ctx.strokeStyle = i % 3 === 0 ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.08)';
+    ctx.lineWidth = i % 3 === 0 ? 2 : 1;
+    ctx.stroke();
+  }
+
+  // Needle — only in guess and result phases
+  const showNeedle = state.phase === 'guess' || state.phase === 'result';
+  if (showNeedle) {
+    const na = Math.PI + state.needleAngle / 180 * Math.PI;
+    const guessIsT0 = state.guessTeam === 0;
+    const nColor = guessIsT0 ? '#3BFFD8' : '#FF4ECD';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(na) * (r + 14), cy + Math.sin(na) * (r + 14));
+    ctx.shadowColor = nColor; ctx.shadowBlur = state.phase === 'guess' ? 14 : 6;
+    ctx.strokeStyle = nColor; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.stroke(); ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 10, 0, 2*Math.PI);
+    ctx.fillStyle = nColor;
+    ctx.shadowColor = nColor; ctx.shadowBlur = state.phase === 'guess' ? 18 : 4;
+    ctx.fill(); ctx.shadowBlur = 0;
+    if (state.phase === 'guess') {
+      ctx.font = 'bold 11px "Space Mono", monospace';
+      ctx.fillStyle = 'rgba(255,255,255,.45)';
+      ctx.textAlign = 'center';
+      ctx.fillText(Math.round(state.needleAngle) + '°', cx, cy - 16);
+    }
+  } else {
+    ctx.beginPath(); ctx.arc(cx, cy, 8, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 3, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fill();
+  }
+}
+
+function setupDialEvents() {
+  const canvas = document.getElementById('dialCanvas');
+  canvas.removeEventListener('mousedown', onDown);
+  canvas.removeEventListener('touchstart', onTouchStart);
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('touchstart', onTouchStart, {passive:false});
+}
+
+function getAngle(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const x = clientX - rect.left - rect.width / 2;
+  const y = clientY - rect.top - 162;
+  let angle = Math.atan2(y, x) * 180 / Math.PI - 180;
+  if (angle < 0) angle += 360;
+  return Math.max(0, Math.min(180, angle));
+}
+
+function onDown(e) {
+  if (state.phase !== 'guess') return;
+  state.dragging = true;
+  state.needleAngle = getAngle(e, e.currentTarget);
+  drawDial();
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function onMove(e) {
+  if (!state.dragging || state.phase !== 'guess') return;
+  e.preventDefault();
+  state.needleAngle = getAngle(e, document.getElementById('dialCanvas'));
+  drawDial();
+}
+
+function onUp() {
+  state.dragging = false;
+  document.removeEventListener('mousemove', onMove);
+  document.removeEventListener('mouseup', onUp);
+}
+
+function onTouchStart(e) {
+  if (state.phase !== 'guess') return;
+  e.preventDefault();
+  state.needleAngle = getAngle(e, e.currentTarget);
+  drawDial();
+  e.currentTarget.addEventListener('touchmove', onTouchMove, {passive:false});
+  e.currentTarget.addEventListener('touchend', onTouchEnd);
+}
+
+function onTouchMove(e) {
+  if (state.phase !== 'guess') return;
+  e.preventDefault();
+  state.needleAngle = getAngle(e, e.currentTarget);
+  drawDial();
+}
+
+function onTouchEnd(e) {
+  e.currentTarget.removeEventListener('touchmove', onTouchMove);
+  e.currentTarget.removeEventListener('touchend', onTouchEnd);
+}
+
+/* ══ SOUNDS ══ */
+let AC;
+function ac() { if(!AC) AC = new(window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); return AC; }
+function playSuccess() {
+  const c = ac(); [523,659,784,1047].forEach((f,i) => { const o=c.createOscillator(),g=c.createGain(); o.connect(g); g.connect(c.destination); o.type='sine'; o.frequency.value=f; const t=c.currentTime+i*.09; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.2,t+.02); g.gain.exponentialRampToValueAtTime(.001,t+.22); o.start(t); o.stop(t+.22); });
+}
+function playOk() {
+  const c = ac(); [440,550].forEach((f,i) => { const o=c.createOscillator(),g=c.createGain(); o.connect(g); g.connect(c.destination); o.type='sine'; o.frequency.value=f; const t=c.currentTime+i*.1; g.gain.setValueAtTime(.15,t); g.gain.exponentialRampToValueAtTime(.001,t+.2); o.start(t); o.stop(t+.2); });
+}
+function playFail() {
+  const c = ac(); [280,220].forEach((f,i) => { const o=c.createOscillator(),g=c.createGain(); o.connect(g); g.connect(c.destination); o.type='sawtooth'; o.frequency.value=f; const t=c.currentTime+i*.13; g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+.22); o.start(t); o.stop(t+.23); });
+}
+
+/* ══ CONFETTI ══ */
+const CONF_COLORS = ['#3BFFD8','#FF4ECD','#FFD93D','#7AADFF','#FF8A8A','#fff'];
+let confParts = [], confRAF;
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  const W = canvas.width = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  confParts = [];
+  for (let i = 0; i < 160; i++) {
+    const a = (Math.random()*360)*Math.PI/180;
+    const speed = 3+Math.random()*7;
+    confParts.push({ x:W/2+(Math.random()-.5)*W*.7, y:H*.45, vx:Math.cos(a)*speed, vy:Math.sin(a)*speed-5, w:6+Math.random()*8, h:4+Math.random()*6, rot:Math.random()*360, rv:(Math.random()-.5)*8, color:CONF_COLORS[Math.floor(Math.random()*CONF_COLORS.length)], life:1 });
+  }
+  cancelAnimationFrame(confRAF);
+  function draw() {
+    ctx.clearRect(0,0,W,H); let alive=false;
+    confParts.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=.25; p.vx*=.99; p.rot+=p.rv; p.life-=.013; p.alpha=Math.max(0,p.life); if(p.alpha>0){alive=true;ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();}});
+    if(alive) confRAF=requestAnimationFrame(draw); else ctx.clearRect(0,0,W,H);
+  }
+  draw();
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('game').classList.contains('active')) drawDial();
+});
+</script>
+</body>
+</html>
