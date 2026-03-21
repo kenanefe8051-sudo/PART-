@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Party Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;touch-action:manipulation;}
+
+:root{
+  --bg:#050810;--surface:#0d1120;--border:rgba(99,220,220,.12);
+  --accent:#3BFFD8;--accent2:#FF4ECD;--accent3:#FFD93D;--red:#FF4757;
+  --text:#e8f4f4;--muted:rgba(232,244,244,.4);
+}
+
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(59,255,216,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,255,216,.04) 1px,transparent 1px);
+  background-size:50px 50px;animation:gridDrift 20s linear infinite;}
+@keyframes gridDrift{from{background-position:0 0}to{background-position:50px 50px}}
+
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 20% 30%,rgba(59,255,216,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 35% at 80% 70%,rgba(255,78,205,.07) 0%,transparent 70%);}
+
+/* ── SCREENS ── */
+.screen{display:none;width:100%;max-width:480px;min-height:100vh;padding:28px 22px;
+  flex-direction:column;align-items:center;justify-content:center;
+  position:relative;z-index:1;gap:16px;}
+.screen.active{display:flex;}
+.screen-top{justify-content:flex-start;padding-top:44px;}
+
+/* ── COMMON ── */
+@keyframes floatLogo{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes bannerIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+.title-xl{font-family:'Space Mono',monospace;font-size:clamp(32px,9vw,50px);
+  font-weight:700;letter-spacing:-2px;line-height:1;
+  background:linear-gradient(135deg,var(--accent),#7DF9FF,var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.label-sm{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--accent);align-self:flex-start;}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:16px 22px;border:none;border-radius:12px;
+  font-family:'Space Mono',monospace;font-size:14px;font-weight:700;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;
+  transition:all .18s;letter-spacing:1px;}
+.btn:active{transform:scale(.97);}
+.btn-cyan{background:linear-gradient(135deg,var(--accent),#00b8a0);color:#050810;
+  box-shadow:0 0 28px rgba(59,255,216,.3);}
+.btn-pink{background:linear-gradient(135deg,var(--accent2),#c026d3);color:#fff;
+  box-shadow:0 0 22px rgba(255,78,205,.3);}
+.btn-red{background:linear-gradient(135deg,var(--red),#c0392b);color:#fff;
+  box-shadow:0 0 22px rgba(255,71,87,.3);}
+.btn-outline{background:transparent;color:var(--muted);border:1.5px solid rgba(232,244,244,.12);font-size:13px;}
+.btn-ghost{background:transparent;color:var(--muted);font-size:12px;padding:10px;border:none;}
+.btn-sm{width:auto;padding:10px 18px;font-size:12px;border-radius:10px;}
+
+/* ── INPUTS ── */
+input[type=text]{flex:1;background:transparent;border:none;
+  color:var(--text);font-family:'Syne',sans-serif;font-size:15px;font-weight:600;outline:none;}
+input::placeholder{color:rgba(232,244,244,.2);}
+.input-row{display:flex;align-items:center;gap:12px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:14px 16px;width:100%;}
+.input-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.add-btn{background:rgba(59,255,216,.12);border:1.5px solid rgba(59,255,216,.25);
+  border-radius:10px;min-width:44px;height:44px;font-size:20px;color:var(--accent);
+  cursor:pointer;flex-shrink:0;touch-action:manipulation;-webkit-appearance:none;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.add-btn:active{transform:scale(.93);}
+.add-btn-yellow{background:rgba(255,217,61,.1);border-color:rgba(255,217,61,.3);color:var(--accent3);}
+
+.tab-row{display:flex;gap:6px;width:100%;background:rgba(255,255,255,.05);border-radius:12px;padding:4px;}
+.tab{flex:1;padding:10px 5px;border:none;border-radius:9px;
+  font-family:'Space Mono',monospace;font-weight:700;font-size:12px;
+  background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center;}
+.tab.active{background:#fff;color:#050810;}
+
+/* ── PLAYER TAGS ── */
+.players-list{display:flex;flex-direction:column;gap:6px;width:100%;max-height:180px;overflow-y:auto;}
+.player-tag{display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.07);border-radius:10px;padding:10px 14px;animation:slideIn .2s ease;}
+.player-left{display:flex;align-items:center;gap:10px;}
+.player-name{font-weight:700;font-size:14px;}
+.remove-x{background:none;border:none;color:rgba(255,255,255,.2);font-size:16px;padding:4px 8px;cursor:pointer;}
+
+/* ── HOW-TO ── */
+.how-to{width:100%;display:flex;flex-direction:column;gap:7px;}
+.how-step{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;}
+.how-num{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);
+  background:rgba(59,255,216,.12);border-radius:6px;padding:2px 7px;flex-shrink:0;margin-top:1px;}
+.how-text{font-size:13px;color:rgba(232,244,244,.7);line-height:1.5;}
+
+/* ── MENU CARDS ── */
+.menu-cards{display:flex;flex-direction:column;gap:12px;width:100%;}
+.menu-card{width:100%;border:none;border-radius:20px;padding:22px;
+  display:flex;align-items:center;gap:16px;text-align:left;
+  cursor:pointer;-webkit-appearance:none;transition:transform .2s;}
+.menu-card:active{transform:scale(.97);}
+.mc-icon{font-size:44px;flex-shrink:0;filter:drop-shadow(0 0 14px rgba(255,255,255,.2));}
+.mc-name{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:#fff;letter-spacing:.5px;}
+.mc-desc{font-size:12px;color:rgba(255,255,255,.55);margin-top:4px;font-weight:600;}
+.mc-wave{background:linear-gradient(135deg,rgba(15,58,48,.9),rgba(10,42,36,.9));
+  border:1.5px solid rgba(59,255,216,.3);box-shadow:0 10px 30px rgba(59,255,216,.12),inset 0 1px 0 rgba(59,255,216,.08);}
+.mc-imp{background:linear-gradient(135deg,rgba(58,15,15,.9),rgba(42,10,10,.9));
+  border:1.5px solid rgba(255,71,87,.3);box-shadow:0 10px 30px rgba(255,71,87,.12),inset 0 1px 0 rgba(255,71,87,.08);}
+
+/* ═══════════════════ WAVELENGTH ═══════════════════ */
+#wl-game{gap:0;justify-content:flex-start;padding-top:20px;padding-bottom:22px;}
+.game-top{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.round-badge{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.scores-row{display:flex;gap:8px;width:100%;margin-bottom:12px;}
+.score-card{flex:1;border-radius:14px;padding:12px 14px;background:var(--surface);border:1.5px solid var(--border);transition:all .3s;}
+.score-card.sc-a{background:rgba(59,255,216,.08);border-color:rgba(59,255,216,.4);box-shadow:0 0 20px rgba(59,255,216,.1);}
+.score-card.sc-b{background:rgba(255,78,205,.08);border-color:rgba(255,78,205,.4);box-shadow:0 0 20px rgba(255,78,205,.1);}
+.sc-team{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.sc-score{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;line-height:1;}
+.score-card.sc-a .sc-score{color:var(--accent);}
+.score-card.sc-b .sc-score{color:var(--accent2);}
+.concept-bar{width:100%;display:flex;align-items:center;gap:10px;margin-bottom:9px;
+  background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
+  padding:13px 16px;position:relative;overflow:hidden;}
+.concept-bar::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,107,107,.06),transparent 40%,transparent 60%,rgba(77,150,255,.06));}
+.concept-word{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;flex:1;}
+.c-left{color:#FF8A8A;text-align:left;}
+.c-right{color:#7AADFF;text-align:right;}
+.concept-sep{color:var(--muted);font-size:18px;flex-shrink:0;}
+.dial-wrap{width:100%;margin:3px 0;}
+#dialCanvas{width:100%;display:block;border-radius:16px;cursor:pointer;touch-action:none;}
+.phase-strip{width:100%;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:9px 16px;font-size:12px;font-weight:700;color:var(--muted);
+  text-align:center;margin-bottom:4px;}
+.phase-strip span{color:var(--accent);}
+.phase-strip span.pink{color:var(--accent2);}
+.clue-box{width:100%;background:rgba(59,255,216,.06);border:1.5px solid rgba(59,255,216,.25);
+  border-radius:14px;padding:13px 16px;display:flex;flex-direction:column;gap:8px;transition:all .3s;}
+.clue-box.pink-mode{background:rgba(255,78,205,.06);border-color:rgba(255,78,205,.25);}
+.clue-lbl{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);}
+.clue-box.pink-mode .clue-lbl{color:var(--accent2);}
+.clue-in{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:11px 14px;color:var(--text);font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:600;outline:none;width:100%;transition:border-color .2s;}
+.clue-in:focus{border-color:rgba(59,255,216,.5);}
+.clue-show{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;
+  text-align:center;letter-spacing:1px;padding:4px 0;}
+.res-banner{width:100%;border-radius:14px;padding:13px 18px;text-align:center;
+  font-family:'Space Mono',monospace;font-size:14px;font-weight:700;letter-spacing:1px;
+  animation:bannerIn .4s cubic-bezier(.175,.885,.32,1.275);}
+.r4{background:rgba(34,197,94,.15);border:1.5px solid rgba(34,197,94,.4);color:#4ade80;}
+.r3{background:rgba(59,255,216,.12);border:1.5px solid rgba(59,255,216,.35);color:var(--accent);}
+.r2{background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.35);color:#fbbf24;}
+.r1{background:rgba(249,115,22,.12);border:1.5px solid rgba(249,115,22,.35);color:#fb923c;}
+.r0{background:rgba(239,68,68,.12);border:1.5px solid rgba(239,68,68,.35);color:#f87171;}
+.game-actions{display:flex;gap:8px;width:100%;margin-top:5px;}
+/* WL final */
+#wl-final{text-align:center;gap:14px;}
+.winner-badge{font-size:68px;animation:floatLogo 2s ease-in-out infinite;}
+.winner-title{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.winner-name{font-family:'Space Mono',monospace;font-size:clamp(24px,7vw,38px);font-weight:700;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;margin:4px 0 10px;}
+.final-scores{width:100%;display:flex;flex-direction:column;gap:8px;}
+.fs-row{display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:13px 18px;}
+.fs-row.win-row{background:rgba(59,255,216,.08);border-color:rgba(59,255,216,.35);}
+.fs-name{font-weight:700;font-size:15px;}
+.fs-pts{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;}
+
+/* ═══════════════════ IMPOSTER ═══════════════════ */
+.imp-center{text-align:center;gap:16px;}
+.big-emoji{font-size:68px;animation:floatLogo 2.5s ease-in-out infinite;}
+.big-title{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;letter-spacing:-1px;}
+.player-spotlight{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;
+  color:var(--accent3);text-shadow:0 0 20px rgba(255,217,61,.4);text-align:center;}
+.imp-hint-card{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;padding:16px 20px;text-align:center;
+  font-size:13px;color:var(--muted);line-height:1.7;width:100%;}
+.secret-box{width:100%;border-radius:20px;padding:26px 20px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:12px;}
+.secret-crew{background:rgba(59,255,216,.08);border:2px solid rgba(59,255,216,.3);}
+.secret-imp{background:rgba(255,71,87,.08);border:2px solid rgba(255,71,87,.3);}
+.role-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.role-icon{font-size:52px;line-height:1;}
+.secret-word{font-family:'Space Mono',monospace;font-size:34px;font-weight:700;letter-spacing:-1px;}
+.secret-crew .secret-word{color:var(--accent);}
+.secret-imp .secret-word{color:var(--red);}
+.role-desc{font-size:13px;color:var(--muted);line-height:1.6;max-width:290px;}
+.discuss-box{width:100%;background:rgba(255,217,61,.07);border:1.5px solid rgba(255,217,61,.2);
+  border-radius:16px;padding:18px;text-align:center;font-size:14px;color:rgba(255,255,255,.7);line-height:1.7;}
+.reveal-word-card{width:100%;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;padding:18px;text-align:center;}
+.rwc-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.rwc-word{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;
+  color:var(--accent3);letter-spacing:-1px;}
+.custom-tags-wrap{display:flex;flex-wrap:wrap;gap:6px;width:100%;min-height:10px;}
+.ctag{background:rgba(255,217,61,.1);border:1px solid rgba(255,217,61,.25);
+  border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:var(--accent3);
+  display:flex;align-items:center;gap:6px;}
+.ctag button{background:none;border:none;color:rgba(255,217,61,.4);cursor:pointer;font-size:12px;padding:0;}
+
+/* confetti */
+#confetti-cv{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+<canvas id="confetti-cv"></canvas>
+
+<!-- ════════════ MAIN MENU ════════════ -->
+<div id="screen-menu" class="screen active">
+  <div style="text-align:center;margin-bottom:6px;">
+    <div style="font-size:56px;margin-bottom:12px;filter:drop-shadow(0 0 22px rgba(59,255,216,.5));animation:floatLogo 3s ease-in-out infinite;">🎮</div>
+    <div class="title-xl">PARTY GAMES</div>
+    <div style="font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:8px;font-family:'Space Mono',monospace;">Bir oyun seç</div>
+  </div>
+  <div class="menu-cards">
+    <button class="menu-card mc-wave" id="btnGoWl">
+      <div class="mc-icon">〰️</div>
+      <div><div class="mc-name">WAVELENGTH</div><div class="mc-desc">Hedefi gör · İpucu ver · Frekansı bul</div></div>
+    </button>
+    <button class="menu-card mc-imp" id="btnGoImp">
+      <div class="mc-icon">🕵️</div>
+      <div><div class="mc-name">IMPOSTER</div><div class="mc-desc">Aramızdaki hain kim? · Kelimeyi bul</div></div>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════ WL SETUP ════════════ -->
+<div id="screen-wl-setup" class="screen screen-top" style="gap:15px;">
+  <div class="title-xl" style="font-size:26px;align-self:flex-start;">〰️ WAVELENGTH</div>
+  <div class="label-sm">Takım İsimleri</div>
+  <div style="display:flex;flex-direction:column;gap:9px;width:100%;">
+    <div class="input-row"><div class="input-dot" style="background:var(--accent)"></div><input type="text" id="wlT1" placeholder="Takım 1" maxlength="18" value="Takım 1"></div>
+    <div class="input-row"><div class="input-dot" style="background:var(--accent2)"></div><input type="text" id="wlT2" placeholder="Takım 2" maxlength="18" value="Takım 2"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="label-sm">Kaç Tur?</div>
+  <div class="tab-row">
+    <button class="tab" data-rounds="5">5</button>
+    <button class="tab active" data-rounds="10">10</button>
+    <button class="tab" data-rounds="15">15</button>
+    <button class="tab" data-rounds="20">20</button>
+  </div>
+  <div class="how-to">
+    <div class="how-step"><span class="how-num">01</span><div class="how-text">Kavram çifti belirir: <b style="color:#FF8A8A">Sıcak</b> ↔ <b style="color:#7AADFF">Soğuk</b> gibi.</div></div>
+    <div class="how-step"><span class="how-num">02</span><div class="how-text"><b style="color:var(--accent)">İpucu veren takım</b> kadrandaki parlak hedef bölgeyi görür — diğer takım bakamaz!</div></div>
+    <div class="how-step"><span class="how-num">03</span><div class="how-text">Hedef gizlenir, ipucu veren <b style="color:var(--accent)">tek kelime</b> söyler.</div></div>
+    <div class="how-step"><span class="how-num">04</span><div class="how-text"><b style="color:var(--accent2)">Diğer takım</b> ibreyi çevirerek tahmin eder. Yakınlık = Puan! 🎯</div></div>
+  </div>
+  <button class="btn btn-cyan" id="btnStartWl">BAŞLAT →</button>
+  <button class="btn btn-ghost" id="btnWlSetupBack">← Ana Menü</button>
+</div>
+
+<!-- ════════════ WL GAME ════════════ -->
+<div id="screen-wl-game" class="screen" style="justify-content:flex-start;padding-top:18px;padding-bottom:20px;gap:0;">
+  <div class="game-top">
+    <div class="round-badge" id="wlRound">TUR 1 / 10</div>
+    <button class="btn btn-ghost btn-sm" id="btnWlHome" style="padding:6px 10px;">🏠</button>
+  </div>
+  <div class="scores-row">
+    <div class="score-card" id="wlSc0"><div class="sc-team" id="wlSN0">TAKIM 1</div><div class="sc-score" id="wlSS0">0</div></div>
+    <div class="score-card" id="wlSc1"><div class="sc-team" id="wlSN1">TAKIM 2</div><div class="sc-score" id="wlSS1">0</div></div>
+  </div>
+  <div class="concept-bar">
+    <div class="concept-word c-left" id="wlCL">SICAK</div>
+    <div class="concept-sep">↔</div>
+    <div class="concept-word c-right" id="wlCR">SOĞUK</div>
+  </div>
+  <div class="dial-wrap"><canvas id="dialCanvas" height="170"></canvas></div>
+  <div class="phase-strip" style="margin-top:4px;margin-bottom:4px;">Aşama: <span id="wlPhase">—</span></div>
+  <div class="clue-box" id="wlClueBox">
+    <div class="clue-lbl" id="wlClueLbl">İPUCU</div>
+    <input class="clue-in" id="wlClueIn" placeholder="Kelime ipucu..." maxlength="30" autocomplete="off">
+  </div>
+  <div id="wlBanner" style="display:none;margin-top:4px;"></div>
+  <div class="game-actions">
+    <button class="btn btn-ghost btn-sm" style="flex:0;padding:12px 14px;" id="btnWlCog">⚙️</button>
+    <button class="btn btn-cyan btn-sm" id="btnWlAction" style="flex:1;font-size:13px;">HAZIR →</button>
+  </div>
+</div>
+
+<!-- ════════════ WL FINAL ════════════ -->
+<div id="screen-wl-final" class="screen" style="text-align:center;gap:14px;">
+  <div class="winner-badge" id="wlWinIcon">🏆</div>
+  <div class="winner-title">KAZANAN TAKIM</div>
+  <div class="winner-name" id="wlWinName">—</div>
+  <div class="final-scores" id="wlFinalScores"></div>
+  <button class="btn btn-cyan" id="btnWlAgain">TEKRAR OYNA 🔄</button>
+  <button class="btn btn-outline" id="btnWlFinalHome">← Ana Menü</button>
+</div>
+
+<!-- ════════════ IMP SETUP ════════════ -->
+<div id="screen-imp-setup" class="screen screen-top" style="gap:13px;">
+  <div class="title-xl" style="font-size:26px;align-self:flex-start;">🕵️ IMPOSTER</div>
+  <div class="label-sm">Oyuncular (En az 3)</div>
+  <div class="players-list" id="impList"></div>
+  <div style="display:flex;gap:10px;width:100%;">
+    <div class="input-row" style="flex:1;"><input type="text" id="impPInput" placeholder="Oyuncu adı..." maxlength="16"></div>
+    <button class="add-btn" id="btnImpAdd">+</button>
+  </div>
+  <div class="divider"></div>
+  <div class="label-sm" style="color:var(--accent3);">Özel Kelimeler (İsteğe Bağlı)</div>
+  <div style="display:flex;gap:10px;width:100%;">
+    <div class="input-row" style="flex:1;border-color:rgba(255,217,61,.2);"><input type="text" id="impWInput" placeholder="Kelime ekle..." maxlength="25" style="color:var(--accent3)"></div>
+    <button class="add-btn add-btn-yellow" id="btnImpAddW">+</button>
+  </div>
+  <div class="custom-tags-wrap" id="impCTags"></div>
+  <div style="font-size:11px;color:var(--muted);width:100%;text-align:center;" id="impWordInfo">Kelime eklenmedi — hazır havuz kullanılacak</div>
+  <button class="btn btn-red" id="btnStartImp">OYUNA BAŞLA 🚀</button>
+  <button class="btn btn-ghost" id="btnImpSetupBack">← Ana Menü</button>
+</div>
+
+<!-- ════════════ IMP PASS ════════════ -->
+<div id="screen-imp-pass" class="screen imp-center">
+  <div class="big-emoji" style="filter:drop-shadow(0 0 18px rgba(59,255,216,.4));">📱</div>
+  <div class="big-title">TELEFONU ONA VER</div>
+  <div class="player-spotlight" id="impPassName">—</div>
+  <div class="imp-hint-card">Diğerleri <b style="color:var(--text)">bakmasın</b>.<br>Hazır olduğunda butona bas.</div>
+  <button class="btn btn-red" id="btnImpReveal" style="font-size:15px;padding:20px;">GİZLİ ROLÜMÜ GÖR 👁️</button>
+</div>
+
+<!-- ════════════ IMP SECRET ════════════ -->
+<div id="screen-imp-secret" class="screen imp-center">
+  <div id="impSecretBox" class="secret-box secret-crew">
+    <div class="role-label">GİZLİ ROLÜN</div>
+    <div class="role-icon" id="impRoleIcon">✅</div>
+    <div class="secret-word" id="impSecretWord">KELIME</div>
+    <div class="role-desc" id="impRoleDesc">Bu kelimeyi bil, ipucu verirken doğal görün!</div>
+  </div>
+  <button class="btn btn-ghost" style="font-size:14px;" id="btnImpHide">ANLADIM, GİZLE 🙈</button>
+</div>
+
+<!-- ════════════ IMP DISCUSS ════════════ -->
+<div id="screen-imp-discuss" class="screen imp-center">
+  <div class="big-emoji" style="filter:drop-shadow(0 0 18px rgba(255,217,61,.4));">🗣️</div>
+  <div class="big-title">TARTIŞMA ZAMANI!</div>
+  <div class="discuss-box">
+    Herkes kelimesini gördü.<br>
+    <b style="color:var(--accent3)">Sırayla</b> kelimeyle ilgili bir ipucu verin.<br>
+    Sonra tartışarak <b style="color:var(--red)">Imposter</b>'ı bulmaya çalışın!
+  </div>
+  <div class="reveal-word-card">
+    <div class="rwc-label">Bu Turun Kelimesi</div>
+    <div class="rwc-word" id="impRevealWord">—</div>
+  </div>
+  <button class="btn btn-red" id="btnImpReplay">YENİ TUR 🔄</button>
+  <button class="btn btn-ghost" id="btnImpDiscHome">← Ana Menü</button>
+</div>
+
+<script>
+/* ════════════════════════════════════
+   UTILS
+════════════════════════════════════ */
+const DOT_COLORS=['#3BFFD8','#FF4ECD','#FFD93D','#7AADFF','#FF8A8A','#c084fc','#6bcb77','#ff9f43'];
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='screen-wl-game') setTimeout(()=>{wlSetupDial();wlDraw();},80);
+}
+
+/* ── SOUNDS ── */
+let _AC;
+function ac(){if(!_AC)_AC=new(window.AudioContext||window.webkitAudioContext)();if(_AC.state==='suspended')_AC.resume();return _AC;}
+function sndSuccess(){const c=ac();[523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;const t=c.currentTime+i*.09;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.start(t);o.stop(t+.22);});}
+function sndOk(){const c=ac();[440,550].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;const t=c.currentTime+i*.1;g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.2);});}
+function sndFail(){const c=ac();[280,220].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.value=f;const t=c.currentTime+i*.13;g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.start(t);o.stop(t+.23);});}
+function sndFlip(){const c=ac();const t=c.currentTime;const b=c.createBuffer(1,Math.floor(c.sampleRate*.1),c.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const n=c.createBufferSource();n.buffer=b;const f2=c.createBiquadFilter();f2.type='bandpass';f2.frequency.value=2200;const g=c.createGain();g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.1);n.connect(f2);f2.connect(g);g.connect(c.destination);n.start(t);n.stop(t+.1);}
+
+/* ── CONFETTI ── */
+const CCOLORS=['#3BFFD8','#FF4ECD','#FFD93D','#7AADFF','#FF8A8A','#fff'];
+let cParts=[],cRAF;
+function confetti(){
+  const cv=document.getElementById('confetti-cv');
+  const W=cv.width=window.innerWidth,H=cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');cParts=[];
+  for(let i=0;i<160;i++){const a=(Math.random()*360)*Math.PI/180,sp=3+Math.random()*7;
+    cParts.push({x:W/2+(Math.random()-.5)*W*.7,y:H*.45,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-5,
+      w:6+Math.random()*8,h:4+Math.random()*6,rot:Math.random()*360,rv:(Math.random()-.5)*8,
+      c:CCOLORS[Math.floor(Math.random()*CCOLORS.length)],life:1});}
+  cancelAnimationFrame(cRAF);
+  function draw(){ctx.clearRect(0,0,W,H);let alive=false;
+    cParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.vx*=.99;p.rot+=p.rv;p.life-=.013;
+      const a=Math.max(0,p.life);if(a>0){alive=true;ctx.save();ctx.globalAlpha=a;
+        ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.c;
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();}});
+    if(alive)cRAF=requestAnimationFrame(draw);else ctx.clearRect(0,0,W,H);}
+  draw();
+}
+
+/* ════════════════════════════════════
+   MAIN MENU
+════════════════════════════════════ */
+document.getElementById('btnGoWl').addEventListener('click',()=>show('screen-wl-setup'));
+document.getElementById('btnGoImp').addEventListener('click',()=>{impRender();show('screen-imp-setup');});
+
+/* ════════════════════════════════════
+   WAVELENGTH
+════════════════════════════════════ */
+const WL_CONCEPTS=[
+  ["Sıcak","Soğuk"],["Hızlı","Yavaş"],["Büyük","Küçük"],["Eski","Yeni"],
+  ["Güzel","Çirkin"],["Pahalı","Ucuz"],["Akıllı","Aptal"],["Güçlü","Zayıf"],
+  ["Mutlu","Üzgün"],["Tehlikeli","Güvenli"],["Kolay","Zor"],["Popüler","Yalnız"],
+  ["Sessiz","Gürültülü"],["Temiz","Kirli"],["Tatlı","Acı"],["Genç","Yaşlı"],
+  ["Yumuşak","Sert"],["Aydınlık","Karanlık"],["Heyecanlı","Sıkıcı"],["Doğal","Yapay"],
+  ["Romantik","Soğuk"],["Komik","Ciddi"],["Lüks","Mütevazı"],["Egzotik","Sıradan"],
+  ["Cesur","Korkak"],["Eğlenceli","Sıkıcı"],["Zarif","Kaba"],["İnanılmaz","Sıradan"],
+  ["Nadir","Yaygın"],["Masum","Suçlu"],["Özgür","Bağımlı"],["Enerjik","Yorgun"],
+  ["Şanslı","Şanssız"],["Sakin","Stresli"],["Renkli","Donuk"],["Antik","Modern"],
+  ["Hafif","Ağır"],["Mükemmel","Berbat"],["Yaratıcı","Sıradan"],["Büyülü","Sıradan"],
+  ["Tehlikeli","Masum"],["Saf","Karmaşık"],["Açık","Kapalı"],["İddialı","Mütevazı"],
+  ["Gizemli","Açık"],["Pratik","Romantik"],["Efsanevi","Unutulmuş"],["Maceracı","Yerinde"],
+  ["Korkutucu","Güven verici"],["Çılgın","Mantıklı"],["Sofistike","Kaba"],["Huzurlu","Kaotik"],
+  ["Yenilikçi","Geleneksel"],["Sıradan","Eşsiz"],["Şeffaf","Gizemli"],["Sonsuz","Sınırlı"],
+];
+
+let wl={
+  teams:[{name:'Takım 1',score:0},{name:'Takım 2',score:0}],
+  ct:0,gt:1,round:1,total:10,
+  target:90,needle:90,concept:null,clue:'',
+  phase:'reveal',used:[],drag:false,
+};
+let wlRounds=10;
+
+document.querySelectorAll('[data-rounds]').forEach(b=>{
+  b.addEventListener('click',()=>{wlRounds=+b.dataset.rounds;document.querySelectorAll('[data-rounds]').forEach(x=>x.classList.remove('active'));b.classList.add('active');});
+});
+document.getElementById('btnWlSetupBack').addEventListener('click',()=>show('screen-menu'));
+document.getElementById('btnWlHome').addEventListener('click',()=>{if(confirm('Oyundan çık?'))show('screen-menu');});
+document.getElementById('btnWlCog').addEventListener('click',()=>show('screen-wl-setup'));
+document.getElementById('btnWlAgain').addEventListener('click',()=>show('screen-wl-setup'));
+document.getElementById('btnWlFinalHome').addEventListener('click',()=>show('screen-menu'));
+
+document.getElementById('btnStartWl').addEventListener('click',()=>{
+  const t1=document.getElementById('wlT1').value.trim()||'Takım 1';
+  const t2=document.getElementById('wlT2').value.trim()||'Takım 2';
+  wl.teams=[{name:t1,score:0},{name:t2,score:0}];
+  wl.ct=0;wl.gt=1;wl.round=1;wl.total=wlRounds;wl.used=[];
+  wlNew();show('screen-wl-game');
+});
+
+function wlPick(){
+  let pool=WL_CONCEPTS.map((_,i)=>i).filter(i=>!wl.used.includes(i));
+  if(!pool.length){wl.used=[];pool=WL_CONCEPTS.map((_,i)=>i);}
+  const i=pool[Math.floor(Math.random()*pool.length)];wl.used.push(i);return WL_CONCEPTS[i];
+}
+function wlNew(){wl.concept=wlPick();wl.target=15+Math.random()*150;wl.needle=90;wl.clue='';wl.phase='reveal';wlRender();}
+
+function wlRender(){
+  const T=wl.teams,ct=wl.ct,gt=wl.gt;
+  document.getElementById('wlRound').textContent=`TUR ${wl.round} / ${wl.total}`;
+  // Scores
+  [0,1].forEach(i=>{
+    const el=document.getElementById('wlSc'+i);
+    const active=(wl.phase==='guess'||wl.phase==='result')?gt:ct;
+    el.className='score-card'+(i===active?(i===0?' sc-a':' sc-b'):'');
+    document.getElementById('wlSN'+i).textContent=T[i].name.toUpperCase();
+    document.getElementById('wlSS'+i).textContent=T[i].score;
+  });
+  // Concept
+  document.getElementById('wlCL').textContent=wl.concept[0];
+  document.getElementById('wlCR').textContent=wl.concept[1];
+  // Phase
+  const pl=document.getElementById('wlPhase');
+  const ctT0=ct===0,gtT0=gt===0;
+  if(wl.phase==='reveal'){pl.className=ctT0?'':'pink';pl.textContent=`${T[ct].name} hedefi görüyor`;}
+  else if(wl.phase==='clue'){pl.className=ctT0?'':'pink';pl.textContent=`${T[ct].name} — İpucu Veriyor`;}
+  else if(wl.phase==='guess'){pl.className=gtT0?'':'pink';pl.textContent=`${T[gt].name} — Tahmin Ediyor`;}
+  else{pl.className='';pl.textContent='Sonuç!';}
+  // Clue box
+  const box=document.getElementById('wlClueBox');
+  const inp=document.getElementById('wlClueIn');
+  const lbl=document.getElementById('wlClueLbl');
+  box.querySelectorAll('.clue-show,.reveal-inf').forEach(e=>e.remove());
+  if(wl.phase==='reveal'){
+    box.className='clue-box'+(ctT0?'':' pink-mode');box.style.display='flex';
+    lbl.textContent='HEDEFİ GÖR — İPUCU HAZIRLA';inp.style.display='none';
+    const d=document.createElement('div');d.className='reveal-inf';
+    d.style.cssText='font-size:13px;color:rgba(232,244,244,.6);line-height:1.7;text-align:center;';
+    d.innerHTML=`Parlak bölge <b style="color:var(--accent)">hedef alandır</b>.<br>Diğer takım bakmasın!<br><span style="color:${ctT0?'var(--accent)':'var(--accent2)'};">${wl.concept[0]} ↔ ${wl.concept[1]}</span>`;
+    box.appendChild(d);
+  } else if(wl.phase==='clue'){
+    box.className='clue-box'+(ctT0?'':' pink-mode');box.style.display='flex';
+    lbl.textContent='İPUCUNU YAZ (1 KELİME)';inp.style.display='block';
+    inp.value=wl.clue;inp.disabled=false;setTimeout(()=>inp.focus(),100);
+  } else if(wl.phase==='guess'){
+    box.className='clue-box'+(gtT0?'':' pink-mode');box.style.display='flex';
+    lbl.textContent='VERİLEN İPUCU';inp.style.display='none';
+    const d=document.createElement('div');d.className='clue-show';
+    d.textContent=wl.clue||'—';d.style.color=gtT0?'var(--accent)':'var(--accent2)';
+    box.appendChild(d);
+  } else {
+    box.style.display='none';
+  }
+  if(wl.phase!=='result') document.getElementById('wlBanner').style.display='none';
+  // Button
+  const btn=document.getElementById('btnWlAction');
+  btn.style.flex='1';btn.style.fontSize='13px';
+  if(wl.phase==='reveal'){btn.textContent='HAZIR — İPUCU GİR →';btn.className='btn btn-sm'+(ctT0?' btn-cyan':' btn-pink');}
+  else if(wl.phase==='clue'){btn.textContent='İPUCU KİLİTLE 🔒';btn.className='btn btn-sm'+(ctT0?' btn-cyan':' btn-pink');}
+  else if(wl.phase==='guess'){btn.textContent='TAHMİN ET ✓';btn.className='btn btn-sm'+(gtT0?' btn-cyan':' btn-pink');}
+  else{btn.textContent=wl.round>=wl.total?'OYUNU BİTİR 🏁':'SONRAKİ TUR →';btn.className='btn btn-cyan btn-sm';}
+  wlDraw();
+}
+
+document.getElementById('btnWlAction').addEventListener('click',wlAction);
+document.getElementById('wlClueIn').addEventListener('keydown',e=>{if(e.key==='Enter')wlAction();});
+
+function wlAction(){
+  if(wl.phase==='reveal'){wl.phase='clue';wlRender();}
+  else if(wl.phase==='clue'){
+    const v=document.getElementById('wlClueIn').value.trim();
+    if(!v){const i=document.getElementById('wlClueIn');i.style.borderColor='rgba(255,78,205,.6)';i.placeholder='Bir kelime yaz!';setTimeout(()=>{i.style.borderColor='';i.placeholder='Kelime ipucu...';},1000);return;}
+    wl.clue=v;wl.needle=90;wl.phase='guess';wlRender();
+  } else if(wl.phase==='guess'){
+    wl.phase='result';
+    const diff=Math.abs(wl.needle-wl.target);
+    let pts=0;if(diff<=4)pts=4;else if(diff<=9)pts=3;else if(diff<=16)pts=2;else if(diff<=24)pts=1;
+    wl.teams[wl.gt].score+=pts;wlRender();
+    const bn=document.getElementById('wlBanner');bn.style.display='block';
+    bn.textContent={4:'🎯 TAM 12! +4 PUAN',3:'✦ ÇOK YAKIN! +3 PUAN',2:'~ YAKIN! +2 PUAN',1:'△ AZ KALDI! +1 PUAN',0:'✕ ISKALADIN! 0 PUAN'}[pts];
+    bn.className='res-banner r'+pts;
+    if(pts>=3){sndSuccess();confetti();}else if(pts===0)sndFail();else sndOk();
+    wlDraw();
+  } else {
+    if(wl.round>=wl.total){wlFinal();}
+    else{wl.round++;const tmp=wl.ct;wl.ct=wl.gt;wl.gt=tmp;wlNew();}
+  }
+}
+
+function wlFinal(){
+  const s=[...wl.teams].sort((a,b)=>b.score-a.score);
+  const draw=wl.teams[0].score===wl.teams[1].score;
+  document.getElementById('wlWinIcon').textContent=draw?'🤝':'🏆';
+  document.getElementById('wlWinName').textContent=draw?'BERABERE!':s[0].name.toUpperCase();
+  document.getElementById('wlFinalScores').innerHTML=s.map((t,i)=>`
+    <div class="fs-row ${i===0&&!draw?'win-row':''}">
+      <span class="fs-name">${t.name}</span>
+      <span class="fs-pts" style="color:${i===0&&!draw?'var(--accent)':'var(--muted)'}">${t.score}</span>
+    </div>`).join('');
+  show('screen-wl-final');setTimeout(()=>confetti(),200);
+}
+
+/* ── DIAL ── */
+function wlDraw(){
+  const cv=document.getElementById('dialCanvas');
+  const W=cv.offsetWidth||420;cv.width=W;cv.height=170;
+  const ctx=cv.getContext('2d');ctx.clearRect(0,0,W,170);
+  const cx=W/2,cy=162,r=148;
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,2*Math.PI);ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=32;ctx.stroke();
+  const gr=ctx.createLinearGradient(0,0,W,0);
+  gr.addColorStop(0,'rgba(255,138,138,.15)');gr.addColorStop(.5,'rgba(59,255,216,.08)');gr.addColorStop(1,'rgba(122,173,255,.15)');
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,2*Math.PI);ctx.strokeStyle=gr;ctx.lineWidth=32;ctx.stroke();
+  if(wl.phase==='reveal'||wl.phase==='result'){
+    [{s:50,c:'rgba(249,115,22,.2)'},{s:32,c:'rgba(251,191,36,.3)'},{s:18,c:'rgba(59,255,216,.4)'},{s:8,c:'rgba(59,255,216,.85)'}].forEach(z=>{
+      const a1=Math.PI+(wl.target-z.s/2)/180*Math.PI,a2=Math.PI+(wl.target+z.s/2)/180*Math.PI;
+      ctx.beginPath();ctx.arc(cx,cy,r,a1,a2);ctx.strokeStyle=z.c;ctx.lineWidth=32;ctx.stroke();
+    });
+    const ta=Math.PI+wl.target/180*Math.PI;
+    ctx.beginPath();ctx.moveTo(cx+Math.cos(ta)*(r-22),cy+Math.sin(ta)*(r-22));ctx.lineTo(cx+Math.cos(ta)*(r+6),cy+Math.sin(ta)*(r+6));
+    ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.lineCap='round';ctx.stroke();
+    ctx.beginPath();ctx.arc(cx+Math.cos(ta)*r,cy+Math.sin(ta)*r,9,0,2*Math.PI);
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.shadowColor='#3BFFD8';ctx.shadowBlur=16;ctx.fill();ctx.shadowBlur=0;
+    if(wl.phase==='reveal'){ctx.font='bold 10px "Space Mono",monospace';ctx.fillStyle='rgba(59,255,216,.9)';ctx.textAlign='center';ctx.fillText('HEDEF',cx+Math.cos(ta)*(r-52),cy+Math.sin(ta)*(r-52));}
+  }
+  for(let i=0;i<=18;i++){
+    const a=Math.PI+(i/18)*Math.PI,len=i%3===0?14:7,ro=r+18;
+    ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*ro,cy+Math.sin(a)*ro);ctx.lineTo(cx+Math.cos(a)*(ro-len),cy+Math.sin(a)*(ro-len));
+    ctx.strokeStyle=i%3===0?'rgba(255,255,255,.2)':'rgba(255,255,255,.08)';ctx.lineWidth=i%3===0?2:1;ctx.stroke();
+  }
+  if(wl.phase==='guess'||wl.phase==='result'){
+    const na=Math.PI+wl.needle/180*Math.PI,nc=wl.gt===0?'#3BFFD8':'#FF4ECD';
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(na)*(r+14),cy+Math.sin(na)*(r+14));
+    ctx.shadowColor=nc;ctx.shadowBlur=wl.phase==='guess'?14:6;ctx.strokeStyle=nc;ctx.lineWidth=4;ctx.lineCap='round';ctx.stroke();ctx.shadowBlur=0;
+    ctx.beginPath();ctx.arc(cx,cy,10,0,2*Math.PI);ctx.fillStyle=nc;ctx.shadowColor=nc;ctx.shadowBlur=wl.phase==='guess'?18:4;ctx.fill();ctx.shadowBlur=0;
+    if(wl.phase==='guess'){ctx.font='bold 11px "Space Mono",monospace';ctx.fillStyle='rgba(255,255,255,.45)';ctx.textAlign='center';ctx.fillText(Math.round(wl.needle)+'°',cx,cy-16);}
+  } else {
+    ctx.beginPath();ctx.arc(cx,cy,8,0,2*Math.PI);ctx.fillStyle='rgba(255,255,255,.12)';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,3,0,2*Math.PI);ctx.fillStyle='rgba(255,255,255,.25)';ctx.fill();
+  }
+}
+
+function wlAngle(e,cv){
+  const rc=cv.getBoundingClientRect();
+  const x=(e.touches?e.touches[0].clientX:e.clientX)-rc.left-rc.width/2;
+  const y=(e.touches?e.touches[0].clientY:e.clientY)-rc.top-162;
+  let a=Math.atan2(y,x)*180/Math.PI-180;if(a<0)a+=360;return Math.max(0,Math.min(180,a));
+}
+function wlSetupDial(){
+  const cv=document.getElementById('dialCanvas');
+  cv.removeEventListener('mousedown',wlMD);cv.removeEventListener('touchstart',wlTS);
+  cv.addEventListener('mousedown',wlMD);cv.addEventListener('touchstart',wlTS,{passive:false});
+}
+function wlMD(e){if(wl.phase!=='guess')return;wl.drag=true;wl.needle=wlAngle(e,e.currentTarget);wlDraw();document.addEventListener('mousemove',wlMV);document.addEventListener('mouseup',wlMU);}
+function wlMV(e){if(!wl.drag||wl.phase!=='guess')return;e.preventDefault();wl.needle=wlAngle(e,document.getElementById('dialCanvas'));wlDraw();}
+function wlMU(){wl.drag=false;document.removeEventListener('mousemove',wlMV);document.removeEventListener('mouseup',wlMU);}
+function wlTS(e){if(wl.phase!=='guess')return;e.preventDefault();wl.needle=wlAngle(e,e.currentTarget);wlDraw();e.currentTarget.addEventListener('touchmove',wlTM,{passive:false});e.currentTarget.addEventListener('touchend',wlTE);}
+function wlTM(e){if(wl.phase!=='guess')return;e.preventDefault();wl.needle=wlAngle(e,e.currentTarget);wlDraw();}
+function wlTE(e){e.currentTarget.removeEventListener('touchmove',wlTM);e.currentTarget.removeEventListener('touchend',wlTE);}
+window.addEventListener('resize',()=>{if(document.getElementById('screen-wl-game').classList.contains('active'))wlDraw();});
+
+/* ════════════════════════════════════
+   IMPOSTER
+════════════════════════════════════ */
+const IMP_POOL=[
+  "Hastane","Havalimanı","Uzay Gemisi","Denizaltı","Kütüphane","Stadyum","Sinema","Restoran",
+  "Banka","Hayvanat Bahçesi","Plaj","Lunapark","Sirk","Bilgisayar","Telefon","Bisiklet","Gitar",
+  "Düğün","Cenaze","Hamam","Hapishane","Üniversite","Karakol","Otobüs Terminali","Kuaför",
+  "Konser","Müze","Buzul","Okul","Piknik","Çöl","Dağ Evi","Disko","Tren","Yat","Çiftlik",
+  "Uzay İstasyonu","Roket","Robot","Akvaryum","Kale","Tekne","Manastır","Fuar","Tiyatro",
+  "Buz Pateni Pisti","Kumarevi","Sirkü","Bataklık","Mağara","Orman","Saray","Fabrika",
+];
+
+let imp={players:[],cWords:[],roles:[],idx:0,word:''};
+
+document.getElementById('btnImpSetupBack').addEventListener('click',()=>show('screen-menu'));
+document.getElementById('btnImpDiscHome').addEventListener('click',()=>show('screen-menu'));
+document.getElementById('btnImpReplay').addEventListener('click',()=>startImp());
+
+document.getElementById('btnImpAdd').addEventListener('click',impAddP);
+document.getElementById('impPInput').addEventListener('keydown',e=>{if(e.key==='Enter')impAddP();});
+document.getElementById('btnImpAddW').addEventListener('click',impAddW);
+document.getElementById('impWInput').addEventListener('keydown',e=>{if(e.key==='Enter')impAddW();});
+
+function impAddP(){
+  const i=document.getElementById('impPInput');
+  const n=i.value.trim();if(!n||imp.players.includes(n)){i.value='';return;}
+  if(imp.players.length>=15)return;
+  imp.players.push(n);i.value='';impRender();
+}
+function impRemP(n){imp.players=imp.players.filter(p=>p!==n);impRender();}
+function impRender(){
+  document.getElementById('impList').innerHTML=imp.players.map((p,i)=>`
+    <div class="player-tag">
+      <div class="player-left">
+        <div style="width:10px;height:10px;border-radius:50%;background:${DOT_COLORS[i%8]};flex-shrink:0;"></div>
+        <div class="player-name">${p}</div>
+      </div>
+      <button class="remove-x" onclick="impRemP('${p}')">✕</button>
+    </div>`).join('');
+}
+
+function impAddW(){
+  const i=document.getElementById('impWInput');
+  const w=i.value.trim();if(!w)return;
+  if(!imp.cWords.includes(w))imp.cWords.push(w);
+  i.value='';impRenderW();
+}
+function impRemW(w){imp.cWords=imp.cWords.filter(x=>x!==w);impRenderW();}
+function impRenderW(){
+  document.getElementById('impCTags').innerHTML=imp.cWords.map(w=>`
+    <div class="ctag">${w}<button onclick="impRemW('${w}')">✕</button></div>`).join('');
+  document.getElementById('impWordInfo').textContent=imp.cWords.length>0
+    ?`${imp.cWords.length} özel kelime — SADECE BUNLAR ÇIKACAK`
+    :'Kelime eklenmedi — hazır havuz kullanılacak';
+}
+
+document.getElementById('btnStartImp').addEventListener('click',()=>{
+  if(imp.players.length<3){alert('En az 3 oyuncu gerekli!');return;}
+  startImp();
+});
+
+function startImp(){
+  const pool=imp.cWords.length>0?imp.cWords:IMP_POOL;
+  imp.word=pool[Math.floor(Math.random()*pool.length)];
+  const sh=[...imp.players].sort(()=>Math.random()-.5);
+  const ii=Math.floor(Math.random()*sh.length);
+  imp.roles=sh.map((name,i)=>({name,isImp:i===ii,word:i===ii?'SEN IMPOSTERSIN!':imp.word}));
+  imp.idx=0;impShowPass();
+}
+
+function impShowPass(){
+  if(imp.idx>=imp.roles.length){
+    document.getElementById('impRevealWord').textContent=imp.word;
+    show('screen-imp-discuss');sndSuccess();return;
+  }
+  document.getElementById('impPassName').textContent=imp.roles[imp.idx].name;
+  show('screen-imp-pass');
+}
+
+document.getElementById('btnImpReveal').addEventListener('click',()=>{
+  sndFlip();
+  const p=imp.roles[imp.idx];
+  const box=document.getElementById('impSecretBox');
+  box.className='secret-box '+(p.isImp?'secret-imp':'secret-crew');
+  document.getElementById('impRoleIcon').textContent=p.isImp?'🕵️':'✅';
+  document.getElementById('impSecretWord').textContent=p.word;
+  document.getElementById('impRoleDesc').innerHTML=p.isImp
+    ?`Diğerleri bir kelime biliyor, <b style="color:var(--red)">sen bilmiyorsun!</b><br>Doğalmış gibi davran, yakalanma.`
+    :`Bu kelimeyi bil, ipucu verirken <b style="color:var(--accent)">doğal görün</b>. Imposter'ı ele verme!`;
+  show('screen-imp-secret');
+});
+
+document.getElementById('btnImpHide').addEventListener('click',()=>{
+  sndFlip();imp.idx++;impShowPass();
+});
+</script>
+</body>
+</html>
