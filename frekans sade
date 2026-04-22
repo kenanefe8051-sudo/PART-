@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Frekans 〰️</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;touch-action:manipulation;}
+:root{
+  --bg:#0e0b1a;
+  --bg2:#13101f;
+  --surface:#1a1730;
+  --surface2:#201d36;
+  --border:rgba(200,190,230,.08);
+  --border2:rgba(200,190,230,.14);
+  --accent:#8b7ec8;
+  --accent2:#b87aaa;
+  --text:#e2dff0;
+  --text2:rgba(226,223,240,.52);
+  --text3:rgba(226,223,240,.26);
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 20% 20%,rgba(139,126,200,.06) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 35% at 80% 75%,rgba(184,122,170,.06) 0%,transparent 60%);}
+
+.screen{display:none;width:100%;max-width:460px;min-height:100vh;
+  padding:24px 20px 80px;flex-direction:column;align-items:center;
+  justify-content:center;position:relative;z-index:1;gap:14px;}
+.screen.active{display:flex;}
+#game{justify-content:flex-start;padding-top:18px;padding-bottom:18px;gap:0;}
+#mode-select{justify-content:flex-start;padding-top:44px;gap:14px;}
+#setup{justify-content:flex-start;padding-top:44px;gap:15px;}
+
+/* SPLASH */
+#splash{text-align:center;gap:0;}
+.splash-emoji{font-size:72px;margin-bottom:12px;display:block;animation:bounce 2s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.splash-title{font-family:'Bebas Neue',cursive;font-size:58px;line-height:1;
+  background:linear-gradient(135deg,#a090d8,#c8a0f0,#b87aaa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 16px rgba(139,126,200,.25));margin-bottom:6px;}
+.splash-sub{font-size:13px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:28px;}
+
+/* BUTTONS */
+.btn{width:100%;padding:16px 22px;border:none;border-radius:14px;
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;transition:all .18s;}
+.btn:active{opacity:.8;}
+.btn-primary{background:linear-gradient(135deg,#7060b0,#5040a0);color:#f0eeff;
+  box-shadow:0 8px 22px rgba(80,64,160,.3);}
+.btn-secondary{background:transparent;color:var(--text2);border:1.5px solid rgba(200,190,230,.1);font-size:14px;}
+.btn-ghost{background:transparent;color:var(--text3);font-size:14px;padding:10px;border:none;}
+.btn-sm{width:auto;padding:10px 18px;font-size:14px;border-radius:12px;}
+.btn-pink{background:linear-gradient(135deg,#8a4a72,#6e3060);color:#f5e0ee;
+  box-shadow:0 8px 20px rgba(110,48,96,.3);}
+.btn-gold{background:linear-gradient(135deg,#7a6020,#5a4010);color:#f5dfa0;
+  box-shadow:0 6px 16px rgba(90,64,16,.3);font-weight:900;}
+
+.label-sm{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--accent);align-self:flex-start;opacity:.7;}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);}
+input[type=text]{flex:1;background:transparent;border:none;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;outline:none;}
+input::placeholder{color:var(--text3);}
+.team-inputs{display:flex;flex-direction:column;gap:10px;width:100%;}
+.team-input-row{display:flex;align-items:center;gap:12px;background:var(--surface);
+  border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;}
+.team-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.rounds-row{display:flex;gap:8px;width:100%;}
+.round-btn{flex:1;padding:12px 6px;border:1.5px solid var(--border);border-radius:12px;
+  background:transparent;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
+  color:var(--text3);cursor:pointer;transition:all .15s;}
+.round-btn.active{background:rgba(139,126,200,.1);border-color:rgba(139,126,200,.3);color:var(--accent);}
+
+/* MODE SELECT */
+.mode-select-title{font-family:'Bebas Neue',cursive;font-size:34px;letter-spacing:1px;
+  align-self:flex-start;color:var(--text);}
+.mode-cards{display:flex;flex-direction:column;gap:11px;width:100%;}
+.mode-card{width:100%;border:none;border-radius:20px;padding:18px 20px;
+  display:flex;align-items:center;gap:14px;text-align:left;
+  cursor:pointer;-webkit-appearance:none;transition:all .2s;position:relative;overflow:hidden;}
+.mode-card:active{opacity:.82;}
+.mode-card-free{background:linear-gradient(135deg,#18203a,#121830);border:1.5px solid rgba(139,126,200,.25);}
+.mode-card-couple{background:linear-gradient(135deg,#2a1828,#201220);border:1.5px solid rgba(184,122,170,.25);}
+.mode-card-friends{background:linear-gradient(135deg,#28200e,#201808);border:1.5px solid rgba(200,170,80,.22);}
+.mode-card-family{background:linear-gradient(135deg,#121a30,#0e1428);border:1.5px solid rgba(100,120,200,.22);}
+.mc-icon{font-size:38px;flex-shrink:0;}
+.mc-info{flex:1;}
+.mc-name{font-family:'Bebas Neue',cursive;font-size:22px;color:#fff;letter-spacing:.5px;margin-bottom:3px;}
+.mc-desc{font-size:12px;color:rgba(226,223,240,.45);font-weight:700;line-height:1.4;}
+.mc-badge{display:flex;align-items:center;gap:5px;margin-top:6px;}
+.mc-free-tag{background:rgba(139,126,200,.12);border:1px solid rgba(139,126,200,.25);
+  border-radius:20px;padding:2px 10px;font-size:11px;font-weight:900;color:var(--accent);}
+.mc-lock-tag{background:rgba(180,150,60,.1);border:1px solid rgba(180,150,60,.22);
+  border-radius:20px;padding:2px 10px;font-size:11px;font-weight:900;
+  color:rgba(200,175,90,.7);display:flex;align-items:center;gap:4px;}
+.mc-owned-tag{background:rgba(139,126,200,.12);border:1px solid rgba(139,126,200,.25);
+  border-radius:20px;padding:2px 10px;font-size:11px;font-weight:900;color:var(--accent);}
+.mode-card-locked{opacity:.72;}
+.mode-card-locked::after{content:'🔒';position:absolute;top:14px;right:16px;font-size:16px;opacity:.4;}
+
+/* SETUP */
+.setup-heading{font-family:'Bebas Neue',cursive;font-size:30px;letter-spacing:.5px;
+  align-self:flex-start;color:var(--text);}
+
+/* GAME */
+.game-top{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.round-badge{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;}
+.mode-chip{font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px;}
+.scores-row{display:flex;gap:9px;width:100%;margin-bottom:11px;}
+.score-card{flex:1;border-radius:14px;padding:11px 14px;background:var(--surface);
+  border:1.5px solid var(--border);transition:all .35s;}
+.score-card.active{background:rgba(139,126,200,.08);border-color:rgba(139,126,200,.28);}
+.score-card.active-pink{background:rgba(184,122,170,.08);border-color:rgba(184,122,170,.28);}
+.sc-team{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
+.sc-score{font-family:'Bebas Neue',cursive;font-size:34px;line-height:1;color:var(--text2);}
+.score-card.active .sc-score{color:var(--accent);}
+.score-card.active-pink .sc-score{color:var(--accent2);}
+.concept-bar{width:100%;display:flex;align-items:center;gap:10px;margin-bottom:8px;
+  background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:13px 16px;}
+.concept-word{font-family:'Bebas Neue',cursive;font-size:18px;flex:1;}
+.concept-left{color:#b08878;text-align:left;}
+.concept-right{color:#7888aa;text-align:right;}
+.concept-sep{color:var(--text3);font-size:16px;flex-shrink:0;}
+.dial-wrap{width:100%;margin:2px 0 5px;}
+#dialCanvas{width:100%;display:block;cursor:pointer;touch-action:none;}
+.phase-strip{width:100%;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:8px 16px;font-size:13px;font-weight:700;
+  color:var(--text3);text-align:center;margin-bottom:5px;}
+.phase-strip span{color:var(--accent);}
+.phase-strip span.pink{color:var(--accent2);}
+.clue-box{width:100%;background:rgba(139,126,200,.04);border:1.5px solid rgba(139,126,200,.12);
+  border-radius:14px;padding:13px 15px;display:flex;flex-direction:column;gap:7px;}
+.clue-box.pink-mode{background:rgba(184,122,170,.04);border-color:rgba(184,122,170,.12);}
+.clue-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);opacity:.7;}
+.clue-box.pink-mode .clue-label{color:var(--accent2);}
+.clue-input{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:11px 14px;color:var(--text);font-family:'Nunito',sans-serif;
+  font-size:16px;font-weight:700;outline:none;width:100%;}
+.clue-input:focus{border-color:rgba(139,126,200,.3);}
+.clue-display{font-family:'Bebas Neue',cursive;font-size:26px;text-align:center;
+  letter-spacing:1px;padding:3px 0;}
+.result-banner{width:100%;border-radius:13px;padding:13px 18px;text-align:center;
+  font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px;
+  animation:bannerIn .4s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes bannerIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.res-4{background:rgba(80,150,110,.12);border:1.5px solid rgba(80,150,110,.3);color:#7aaa90;}
+.res-3{background:rgba(90,130,160,.1);border:1.5px solid rgba(90,130,160,.28);color:#80a8c0;}
+.res-2{background:rgba(150,140,70,.1);border:1.5px solid rgba(150,140,70,.26);color:#a89e58;}
+.res-1{background:rgba(160,110,60,.1);border:1.5px solid rgba(160,110,60,.24);color:#a87848;}
+.res-0{background:rgba(160,70,70,.1);border:1.5px solid rgba(160,70,70,.22);color:#a06060;}
+.game-actions{display:flex;gap:8px;width:100%;margin-top:5px;}
+
+/* RESULT */
+#result-screen{text-align:center;gap:14px;}
+.winner-badge{font-size:64px;animation:bounce 1.8s infinite;}
+.winner-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text3);}
+.winner-name{font-family:'Bebas Neue',cursive;font-size:clamp(28px,8vw,44px);
+  color:var(--accent);margin:4px 0 14px;letter-spacing:1px;}
+.final-scores{width:100%;display:flex;flex-direction:column;gap:8px;}
+.fs-row{display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:14px 18px;}
+.fs-row.winner-row{background:rgba(139,126,200,.08);border-color:rgba(139,126,200,.24);}
+.fs-name{font-weight:900;font-size:15px;}
+.fs-score{font-family:'Bebas Neue',cursive;font-size:26px;}
+
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(6,4,16,.85);backdrop-filter:blur(8px);
+  align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{width:100%;max-width:460px;background:var(--bg2);
+  border:1.5px solid var(--border2);border-bottom:none;
+  border-radius:22px 22px 0 0;padding:22px 22px 44px;
+  display:flex;flex-direction:column;gap:14px;
+  animation:sheetUp .3s cubic-bezier(.25,.8,.25,1);}
+@keyframes sheetUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border2);align-self:center;margin-bottom:2px;}
+.modal-title{font-family:'Bebas Neue',cursive;font-size:22px;color:var(--text);letter-spacing:.5px;}
+.unlock-hero{text-align:center;padding:6px 0;}
+.unlock-icon{font-size:52px;margin-bottom:8px;display:block;}
+.unlock-name{font-family:'Bebas Neue',cursive;font-size:26px;color:var(--text);letter-spacing:.5px;}
+.unlock-desc{font-size:13px;color:var(--text2);margin-top:5px;line-height:1.55;}
+.unlock-features{width:100%;display:flex;flex-direction:column;gap:7px;}
+.uf-row{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;}
+.uf-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.uf-text{font-size:13px;color:var(--text2);line-height:1.4;}
+.uf-text b{color:var(--text);}
+.price-row{display:flex;align-items:center;justify-content:center;
+  padding:13px;background:rgba(139,126,200,.06);border:1.5px solid rgba(139,126,200,.14);border-radius:14px;}
+.price-main{font-family:'Bebas Neue',cursive;font-size:32px;color:var(--accent);}
+.price-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.how-to{width:100%;display:flex;flex-direction:column;gap:8px;}
+.how-step{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;}
+.how-num{font-size:10px;font-weight:900;color:var(--accent);
+  background:rgba(139,126,200,.1);border-radius:6px;padding:2px 8px;flex-shrink:0;margin-top:1px;}
+.how-text{font-size:13px;color:var(--text2);line-height:1.55;}
+
+/* AD */
+.ad-overlay{display:none;position:fixed;inset:0;z-index:900;
+  background:rgba(6,4,16,.92);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;flex-direction:column;}
+.ad-overlay.open{display:flex;}
+.ad-card{width:100%;max-width:370px;margin:0 16px;background:var(--surface2);
+  border:1.5px solid var(--border2);border-radius:20px;overflow:hidden;}
+.ad-header{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);}
+.ad-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);}
+.ad-skip-btn{font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;
+  background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:5px 13px;color:var(--text2);cursor:pointer;min-width:90px;text-align:center;}
+.ad-skip-btn.ready{background:rgba(139,126,200,.12);border-color:rgba(139,126,200,.28);color:var(--accent);}
+.ad-body{padding:28px 22px;text-align:center;}
+.ad-emoji{font-size:44px;margin-bottom:10px;display:block;}
+.ad-title{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--text);margin-bottom:5px;letter-spacing:.5px;}
+.ad-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:16px;}
+.ad-cta{display:inline-block;padding:9px 20px;background:rgba(139,126,200,.15);
+  border:1px solid rgba(139,126,200,.28);border-radius:10px;font-size:13px;font-weight:900;color:var(--accent);}
+.ad-progress{width:100%;height:3px;background:rgba(255,255,255,.05);}
+.ad-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;}
+.ad-hint{font-size:11px;color:var(--text3);margin-top:13px;font-weight:700;}
+
+.fab-help{position:fixed;bottom:22px;right:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--surface2);border:1.5px solid var(--border2);color:var(--accent);
+  font-family:'Bebas Neue',cursive;font-size:22px;cursor:pointer;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.3);-webkit-appearance:none;touch-action:manipulation;}
+.fab-help:active{transform:scale(.92);}
+#confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<!-- HELP -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">〰️ Nasıl Oynanır?</div>
+    <div class="how-to">
+      <div class="how-step"><span class="how-num">01</span>
+        <div class="how-text">Bir kavram çifti belirir: <b style="color:#b08878">Sıcak</b> ↔ <b style="color:#7888aa">Soğuk</b> gibi.</div></div>
+      <div class="how-step"><span class="how-num">02</span>
+        <div class="how-text"><b style="color:var(--accent)">İpucu veren takım</b> kadrandaki hedef bölgeyi görür. Diğer takım bakamaz!</div></div>
+      <div class="how-step"><span class="how-num">03</span>
+        <div class="how-text">Hedef gizlenir. İpucu veren takım <b style="color:var(--accent)">tek kelime</b> ipucu verir.</div></div>
+      <div class="how-step"><span class="how-num">04</span>
+        <div class="how-text"><b style="color:var(--accent2)">Diğer takım</b> kırmızı ibreyi çevirerek tahmin eder. Ne kadar yakın = o kadar puan! 🎯</div></div>
+      <div class="how-step"><span class="how-num">🏆</span>
+        <div class="how-text">Tam isabet <b>+4 puan</b> · Çok yakın +3 · Yakın +2 · Az kaldı +1. Her turda roller değişir!</div></div>
+    </div>
+    <button class="btn btn-primary" id="btnCloseHelp">ANLADIM ✓</button>
+  </div>
+</div>
+
+<!-- UNLOCK -->
+<div class="modal-overlay" id="unlockModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="unlock-hero">
+      <span class="unlock-icon" id="unlockIcon">💑</span>
+      <div class="unlock-name" id="unlockName">MOD ADI</div>
+      <div class="unlock-desc" id="unlockDesc">Açıklama</div>
+    </div>
+    <div class="unlock-features" id="unlockFeatures"></div>
+    <div class="price-row">
+      <div style="text-align:center;">
+        <div class="price-main" id="unlockPrice">₺30</div>
+        <div class="price-sub">tek seferlik · sadece bu mod</div>
+      </div>
+    </div>
+    <button class="btn btn-gold" id="btnUnlockBuy">SATIN AL ⭐</button>
+    <button class="btn btn-ghost" id="btnUnlockClose">Belki daha sonra</button>
+  </div>
+</div>
+
+<!-- AD -->
+<div class="ad-overlay" id="adOverlay">
+  <div class="ad-card">
+    <div class="ad-header">
+      <span class="ad-label">📺 Reklam</span>
+      <button class="ad-skip-btn" id="adSkipBtn">5s bekle...</button>
+    </div>
+    <div class="ad-body">
+      <span class="ad-emoji" id="adEmoji">🎮</span>
+      <div class="ad-title" id="adTitle">Reklam</div>
+      <div class="ad-desc" id="adDesc">Açıklama</div>
+      <div class="ad-cta" id="adCta">Daha Fazla</div>
+    </div>
+    <div class="ad-progress"><div class="ad-progress-bar" id="adProgressBar"></div></div>
+  </div>
+  <div class="ad-hint">Modu satın alırsan reklam görmezsin 🎉</div>
+</div>
+
+<!-- SPLASH -->
+<div id="splash" class="screen active">
+  <span class="splash-emoji">〰️</span>
+  <div class="splash-title">FREKANS</div>
+  <div class="splash-sub">Frekansını bul</div>
+  <button class="btn btn-primary" id="btnGoModes" style="margin-top:12px;">OYNA →</button>
+</div>
+
+<!-- MOD SEÇİM -->
+<div id="mode-select" class="screen">
+  <div class="mode-select-title">Mod Seç</div>
+  <div style="font-size:13px;color:var(--text3);align-self:flex-start;margin-top:-8px;font-weight:700;">Her modun kendine özel kavramları var</div>
+  <div class="mode-cards" id="modeCards">
+    <button class="mode-card mode-card-free" data-mode="general">
+      <div class="mc-icon">〰️</div>
+      <div class="mc-info">
+        <div class="mc-name">Genel</div>
+        <div class="mc-desc">Herkes için evrensel kavramlar · Geniş konu yelpazesi</div>
+        <div class="mc-badge"><span class="mc-free-tag">ÜCRETSİZ</span></div>
+      </div>
+    </button>
+    <button class="mode-card mode-card-couple" data-mode="couple" id="mc-couple">
+      <div class="mc-icon">💑</div>
+      <div class="mc-info">
+        <div class="mc-name">Çiftler</div>
+        <div class="mc-desc">İlişkiler, duygular, birlikte anlar · Partnerinizi ne kadar tanıyorsunuz?</div>
+        <div class="mc-badge" id="badge-couple"><span class="mc-lock-tag">🔒 ₺30</span></div>
+      </div>
+    </button>
+    <button class="mode-card mode-card-friends" data-mode="friends" id="mc-friends">
+      <div class="mc-icon">🍻</div>
+      <div class="mc-info">
+        <div class="mc-name">Arkadaşlar 18+</div>
+        <div class="mc-desc">Cesur, eğlenceli, biraz tabu · Yetişkinler için özel kavramlar</div>
+        <div class="mc-badge" id="badge-friends"><span class="mc-lock-tag">🔒 ₺30</span></div>
+      </div>
+    </button>
+    <button class="mode-card mode-card-family" data-mode="family" id="mc-family">
+      <div class="mc-icon">👨‍👩‍👧‍👦</div>
+      <div class="mc-info">
+        <div class="mc-name">Aile</div>
+        <div class="mc-desc">Her yaşa uygun · Çocuklar ve büyükler bir arada oynasın</div>
+        <div class="mc-badge" id="badge-family"><span class="mc-lock-tag">🔒 ₺30</span></div>
+      </div>
+    </button>
+  </div>
+  <button class="btn btn-ghost" id="btnModesBack">← Geri</button>
+</div>
+
+<!-- SETUP -->
+<div id="setup" class="screen">
+  <div class="setup-heading" id="setupHeading">Kurulum</div>
+  <div class="label-sm">Takım İsimleri</div>
+  <div class="team-inputs">
+    <div class="team-input-row">
+      <div class="team-color-dot" style="background:#8b7ec8"></div>
+      <input type="text" id="team1Input" placeholder="Takım 1" maxlength="18" value="Takım 1">
+    </div>
+    <div class="team-input-row">
+      <div class="team-color-dot" style="background:#b87aaa"></div>
+      <input type="text" id="team2Input" placeholder="Takım 2" maxlength="18" value="Takım 2">
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="label-sm">Kaç Tur?</div>
+  <div class="rounds-row">
+    <button class="round-btn" data-rounds="5">5</button>
+    <button class="round-btn active" data-rounds="10">10</button>
+    <button class="round-btn" data-rounds="15">15</button>
+    <button class="round-btn" data-rounds="20">20</button>
+  </div>
+  <button class="btn btn-primary" id="btnStartGame" style="margin-top:8px;">BAŞLAT →</button>
+  <button class="btn btn-ghost" id="btnSetupBack">← Geri</button>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="game-top">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="round-badge" id="roundBadge">TUR 1 / 10</div>
+      <div class="mode-chip" id="modeChip"></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="btnGameHome" style="padding:6px 10px;">🏠</button>
+  </div>
+  <div class="scores-row">
+    <div class="score-card" id="sc0"><div class="sc-team" id="scName0">TAKIM 1</div><div class="sc-score" id="scScore0">0</div></div>
+    <div class="score-card" id="sc1"><div class="sc-team" id="scName1">TAKIM 2</div><div class="sc-score" id="scScore1">0</div></div>
+  </div>
+  <div class="concept-bar">
+    <div class="concept-word concept-left" id="conceptLeft">—</div>
+    <div class="concept-sep">↔</div>
+    <div class="concept-word concept-right" id="conceptRight">—</div>
+  </div>
+  <div class="dial-wrap"><canvas id="dialCanvas"></canvas></div>
+  <div class="phase-strip" style="margin-top:5px;">Aşama: <span id="phaseLabel">—</span></div>
+  <div class="clue-box" id="clueBox">
+    <div class="clue-label" id="clueBoxLabel">İPUCU</div>
+    <input class="clue-input" id="clueInput" placeholder="Kelime ipucu..." maxlength="30" autocomplete="off">
+  </div>
+  <div id="resultBanner" style="display:none"></div>
+  <div class="game-actions">
+    <button class="btn btn-ghost btn-sm" style="flex:0;padding:12px 14px;" id="btnGameBack2">⚙️</button>
+    <button class="btn btn-primary btn-sm" id="btnAction" style="flex:1;">HAZIR →</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen" class="screen">
+  <div class="winner-badge" id="winnerEmoji">🏆</div>
+  <div class="winner-title">KAZANAN TAKIM</div>
+  <div class="winner-name" id="winnerName">—</div>
+  <div class="final-scores" id="finalScores"></div>
+  <button class="btn btn-primary" id="btnPlayAgain">TEKRAR OYNA 🔄</button>
+  <button class="btn btn-secondary" id="btnResultHome">← Ana Sayfa</button>
+</div>
+
+<button class="fab-help" id="btnHelp">?</button>
+
+<script>
+const CONCEPT_PACKS={
+  general:[
+    ["Sıcak","Soğuk"],["Hızlı","Yavaş"],["Büyük","Küçük"],["Eski","Yeni"],
+    ["Güzel","Çirkin"],["Pahalı","Ucuz"],["Akıllı","Aptal"],["Güçlü","Zayıf"],
+    ["Mutlu","Üzgün"],["Tehlikeli","Güvenli"],["Kolay","Zor"],["Popüler","Yalnız"],
+    ["Sessiz","Gürültülü"],["Temiz","Kirli"],["Tatlı","Acı"],["Genç","Yaşlı"],
+    ["Yumuşak","Sert"],["Aydınlık","Karanlık"],["Heyecanlı","Sıkıcı"],["Doğal","Yapay"],
+    ["Komik","Ciddi"],["Lüks","Mütevazı"],["Egzotik","Sıradan"],["Cesur","Korkak"],
+    ["Zarif","Kaba"],["Nadir","Yaygın"],["Masum","Suçlu"],["Özgür","Bağımlı"],
+    ["Enerjik","Yorgun"],["Şanslı","Şanssız"],["Sakin","Stresli"],["Renkli","Donuk"],
+    ["Hafif","Ağır"],["Mükemmel","Berbat"],["Yaratıcı","Sıradan"],["Büyülü","Sıradan"],
+    ["Saf","Karmaşık"],["Açık","Kapalı"],["Gizemli","Açık"],["Pratik","Romantik"],
+    ["Efsanevi","Unutulmuş"],["Maceracı","Yerinde"],["Sofistike","Kaba"],["Huzurlu","Kaotik"],
+    ["Yenilikçi","Geleneksel"],["Şeffaf","Gizemli"],["Kalabalık","Tenha"],["Derin","Sığ"],
+    ["Paylaşımcı","Bencil"],["Güvenilir","Şüpheli"],["Aktif","Pasif"],["Sade","Gösterişli"],
+  ],
+  couple:[
+    ["Romantik","Pratik"],["Tutkulu","Sakin"],["Yakın","Uzak"],["Özel","Sıradan"],
+    ["Samimi","Mesafeli"],["Şefkatli","Soğuk"],["Kıskanç","Güvenen"],["Çılgın","Mantıklı"],
+    ["Flörtöz","Çekingen"],["İçten","Yüzeysel"],["Fedakâr","Bencil"],["Tutku","Alışkanlık"],
+    ["Sürpriz","Rutin"],["Heyecan","Güven"],["Kavga","Barış"],["Özgürlük","Bağlılık"],
+    ["Konuşkan","Sessiz"],["Ev","Macera"],["Fiziksel","Duygusal"],["Affedici","Kırılgan"],
+    ["Beklenmedik","Planlı"],["Açık sözlü","Sırlarla dolu"],["Sabırlı","Sabırsız"],
+    ["Hırslı","Tatminkâr"],["Cömert","Tutumlu"],["Destekleyici","Baskıcı"],
+    ["Ayrılık","Kavuşma"],["Kıskançlık","Özgüven"],["Film gecesi","Dışarı çıkma"],
+    ["Şehir","Kır"],["Yaz","Kış"],["Dans","Müzik"],["Sonsuz","Anlık"],
+  ],
+  friends:[
+    ["Çılgın","Sıkıcı"],["Utanmaz","Utangaç"],["Efsane","Korkunç"],
+    ["Sarhoş","Ayık"],["Dedikodu","Sır"],["Parti","Ev"],["Gece","Sabah"],
+    ["Abartılı","Alçakgönüllü"],["Yasaklı","Serbest"],["Cesur","Korkak"],
+    ["İtiraf","Sır"],["Flört","Arkadaşlık"],["Macera","Ev dizi"],
+    ["Dürüst","Şeker yaldızlı"],["Planlı","Spontane"],["Ucuz","Pahalı"],
+    ["Çekici","İtici"],["Popüler","Yalnız"],["Kahkaha","Gözyaşı"],
+    ["Gerçek","Yalan"],["Risk","Emniyet"],["Güçlü","Kırılgan"],
+    ["Vahşi","Evcil"],["Enerji","Tembellik"],["Samimi","Sahte"],["Tabu","Serbest"],
+  ],
+  family:[
+    ["Neşeli","Üzgün"],["Hızlı","Yavaş"],["Büyük","Küçük"],["Yumuşak","Sert"],
+    ["Tatlı","Ekşi"],["Komik","Ciddi"],["Temiz","Pis"],["Sessiz","Gürültülü"],
+    ["Sıcak","Soğuk"],["Parlak","Sönük"],["Hafif","Ağır"],["Kolay","Zor"],
+    ["Güzel","Çirkin"],["İyi","Kötü"],["Güçlü","Zayıf"],["Heyecanlı","Sıkıcı"],
+    ["Aydınlık","Karanlık"],["Gerçek","Hayal"],["Masum","Yaramaz"],
+    ["Kahkaha","Ağlama"],["Doğa","Şehir"],["Yaz tatili","Okul"],
+    ["Çikolata","Brokoli"],["Köpek","Kedi"],["Deniz","Dağ"],
+    ["Yıldız","Ay"],["Rüzgar","Güneş"],["Oyun","Ödev"],["Masal","Gerçek"],
+  ],
+};
+
+const MODE_META={
+  general:{name:'Genel',icon:'〰️',price:null,chipColor:'rgba(139,126,200,.15)',chipTextColor:'#a090d0',features:[],desc:''},
+  couple:{name:'Çiftler 💑',icon:'💑',price:'₺30',chipColor:'rgba(184,122,170,.15)',chipTextColor:'#c090b8',
+    desc:'Partnerinizi ne kadar iyi tanıyorsunuz? Duygular, anlar, alışkanlıklar...',
+    features:[
+      {icon:'💬',text:'<b>İlişki odaklı kavramlar</b><br>Romantizm, güven, özgürlük ve çok daha fazlası.'},
+      {icon:'🎯',text:'<b>Birbirinizi keşfedin</b><br>Frekansınız ne kadar yakın?'},
+      {icon:'🔒',text:'<b>Reklamsız oyun</b><br>Bu modu satın alanlara reklam gösterilmez.'},
+    ]},
+  friends:{name:'Arkadaşlar 18+',icon:'🍻',price:'₺30',chipColor:'rgba(160,140,70,.15)',chipTextColor:'#b8a060',
+    desc:'Sadece yetişkinler için! Cesur, eğlenceli ve biraz tabu kavramlar.',
+    features:[
+      {icon:'🔥',text:'<b>18+ kavramlar</b><br>Arkadaş grupları için tasarlandı.'},
+      {icon:'🤣',text:'<b>Tartışma başlatır</b><br>Her kavram bir anı tetikler.'},
+      {icon:'🔒',text:'<b>Reklamsız oyun</b><br>Bu modu satın alanlara reklam gösterilmez.'},
+    ]},
+  family:{name:'Aile',icon:'👨‍👩‍👧‍👦',price:'₺30',chipColor:'rgba(100,110,190,.15)',chipTextColor:'#9090c8',
+    desc:'Her yaşa uygun eğlence! Çocuklarla ve büyüklerle birlikte oynayın.',
+    features:[
+      {icon:'👶',text:'<b>Her yaşa uygun</b><br>Çocuklar da dahil herkes anlayabilir.'},
+      {icon:'😄',text:'<b>Aile anıları</b><br>Yemek, tatil, oyunlar ve sevimli kavramlar.'},
+      {icon:'🔒',text:'<b>Reklamsız oyun</b><br>Bu modu satın alanlara reklam gösterilmez.'},
+    ]},
+};
+
+const ADS=[
+  {emoji:'🍕',title:'Lezzetli Pizza',desc:'İlk siparişe %20 indirim!',cta:'Sipariş Ver'},
+  {emoji:'📱',title:'Yeni Uygulama',desc:'Arkadaşlarınla bağlı kal.',cta:'İndir'},
+  {emoji:'☕',title:'Kahve',desc:'En iyi kahveler kapında.',cta:'Keşfet'},
+  {emoji:'🎵',title:'Müzik',desc:'3 ay ücretsiz dene!',cta:'Dene'},
+];
+
+function getOwnedModes(){try{return JSON.parse(localStorage.getItem('frekans_modes')||'{}');}catch(e){return {};}}
+function saveModes(o){localStorage.setItem('frekans_modes',JSON.stringify(o));}
+let ownedModes=getOwnedModes();ownedModes.general=true;
+
+let adTimer=null,adSkipEnabled=false,adCallback=null;
+const AD_DURATION=30,AD_SKIP_AFTER=5;
+let selectedMode='general',selectedRounds=10;
+
+let state={
+  teams:[{name:'Takım 1',score:0},{name:'Takım 2',score:0}],
+  clueTeam:0,guessTeam:1,round:1,totalRounds:10,
+  targetAngle:90,needleAngle:90,concept:null,clue:'',
+  phase:'reveal',usedConcepts:[],dragging:false,
+};
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='game')setTimeout(()=>{setupDialEvents();drawDial();},80);
+}
+
+function refreshModeBadges(){
+  ['couple','friends','family'].forEach(m=>{
+    const el=document.getElementById('badge-'+m),card=document.getElementById('mc-'+m);
+    if(!el||!card)return;
+    if(ownedModes[m]){el.innerHTML='<span class="mc-owned-tag">✓ AÇIK</span>';card.classList.remove('mode-card-locked');}
+    else{el.innerHTML=`<span class="mc-lock-tag">🔒 ${MODE_META[m].price}</span>`;card.classList.add('mode-card-locked');}
+  });
+}
+
+document.getElementById('btnGoModes').addEventListener('click',()=>{refreshModeBadges();show('mode-select');});
+document.getElementById('btnModesBack').addEventListener('click',()=>show('splash'));
+document.getElementById('btnSetupBack').addEventListener('click',()=>show('mode-select'));
+document.getElementById('btnGameHome').addEventListener('click',()=>{if(confirm('Oyundan çıkmak istiyor musun?'))show('splash');});
+document.getElementById('btnGameBack2').addEventListener('click',()=>show('setup'));
+document.getElementById('btnPlayAgain').addEventListener('click',()=>show('setup'));
+document.getElementById('btnResultHome').addEventListener('click',()=>show('splash'));
+
+document.getElementById('modeCards').addEventListener('click',e=>{
+  const card=e.target.closest('[data-mode]');if(!card)return;
+  const mode=card.dataset.mode;
+  if(mode==='general'||ownedModes[mode]){
+    selectedMode=mode;
+    const meta=MODE_META[mode];
+    document.getElementById('setupHeading').textContent=meta.icon+' '+meta.name;
+    const chip=document.getElementById('modeChip');
+    chip.textContent=meta.icon+' '+meta.name.split(' ')[0];
+    chip.style.cssText=`background:${meta.chipColor};color:${meta.chipTextColor};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:900;`;
+    show('setup');
+  }else{openUnlockModal(mode);}
+});
+
+let pendingUnlockMode=null;
+function openUnlockModal(mode){
+  pendingUnlockMode=mode;const meta=MODE_META[mode];
+  document.getElementById('unlockIcon').textContent=meta.icon;
+  document.getElementById('unlockName').textContent=meta.name;
+  document.getElementById('unlockDesc').textContent=meta.desc;
+  document.getElementById('unlockPrice').textContent=meta.price;
+  document.getElementById('btnUnlockBuy').textContent=`${meta.price} — SATIN AL ⭐`;
+  document.getElementById('unlockFeatures').innerHTML=meta.features.map(f=>`
+    <div class="uf-row"><span class="uf-icon">${f.icon}</span><div class="uf-text">${f.text}</div></div>`).join('');
+  document.getElementById('unlockModal').classList.add('open');
+}
+document.getElementById('btnUnlockClose').addEventListener('click',()=>{document.getElementById('unlockModal').classList.remove('open');pendingUnlockMode=null;});
+document.getElementById('unlockModal').addEventListener('click',e=>{if(e.target===document.getElementById('unlockModal')){document.getElementById('unlockModal').classList.remove('open');pendingUnlockMode=null;}});
+document.getElementById('btnUnlockBuy').addEventListener('click',()=>{
+  if(!pendingUnlockMode)return;
+  const meta=MODE_META[pendingUnlockMode];
+  if(confirm(`${meta.name} modu ${meta.price} olacak.\n\n(Simülasyon — gerçek ödeme alınmaz)`)){
+    ownedModes[pendingUnlockMode]=true;saveModes(ownedModes);refreshModeBadges();
+    document.getElementById('unlockModal').classList.remove('open');
+    setTimeout(()=>{
+      alert(`✓ ${meta.name} modu açıldı!`);
+      selectedMode=pendingUnlockMode;
+      const m=MODE_META[pendingUnlockMode],chip=document.getElementById('modeChip');
+      chip.textContent=m.icon+' '+m.name.split(' ')[0];
+      chip.style.cssText=`background:${m.chipColor};color:${m.chipTextColor};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:900;`;
+      document.getElementById('setupHeading').textContent=m.icon+' '+m.name;
+      show('setup');pendingUnlockMode=null;
+    },200);
+  }
+});
+
+document.querySelectorAll('[data-rounds]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    selectedRounds=parseInt(btn.dataset.rounds);
+    document.querySelectorAll('[data-rounds]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('btnStartGame').addEventListener('click',()=>{
+  const t1=document.getElementById('team1Input').value.trim()||'Takım 1';
+  const t2=document.getElementById('team2Input').value.trim()||'Takım 2';
+  state.teams=[{name:t1,score:0},{name:t2,score:0}];
+  state.clueTeam=0;state.guessTeam=1;state.round=1;
+  state.totalRounds=selectedRounds;state.usedConcepts=[];
+  newRound();show('game');
+});
+
+document.getElementById('btnHelp').addEventListener('click',()=>document.getElementById('helpModal').classList.add('open'));
+document.getElementById('btnCloseHelp').addEventListener('click',()=>document.getElementById('helpModal').classList.remove('open'));
+document.getElementById('helpModal').addEventListener('click',e=>{if(e.target===document.getElementById('helpModal'))document.getElementById('helpModal').classList.remove('open');});
+
+function showAd(cb){
+  if(ownedModes[selectedMode]&&selectedMode!=='general'){cb();return;}
+  adCallback=cb;adSkipEnabled=false;
+  const ad=ADS[Math.floor(Math.random()*ADS.length)];
+  document.getElementById('adEmoji').textContent=ad.emoji;
+  document.getElementById('adTitle').textContent=ad.title;
+  document.getElementById('adDesc').textContent=ad.desc;
+  document.getElementById('adCta').textContent=ad.cta;
+  document.getElementById('adProgressBar').style.width='0%';
+  document.getElementById('adSkipBtn').textContent=`${AD_SKIP_AFTER}s bekle...`;
+  document.getElementById('adSkipBtn').className='ad-skip-btn';
+  document.getElementById('adOverlay').classList.add('open');
+  let elapsed=0;clearInterval(adTimer);
+  adTimer=setInterval(()=>{
+    elapsed+=100;
+    document.getElementById('adProgressBar').style.width=Math.min((elapsed/(AD_DURATION*1000))*100,100)+'%';
+    if(elapsed>=AD_SKIP_AFTER*1000&&!adSkipEnabled){
+      adSkipEnabled=true;document.getElementById('adSkipBtn').textContent='Geç ⟩⟩';document.getElementById('adSkipBtn').className='ad-skip-btn ready';
+    }else if(!adSkipEnabled)document.getElementById('adSkipBtn').textContent=`${Math.ceil((AD_SKIP_AFTER*1000-elapsed)/1000)}s bekle...`;
+    if(elapsed>=AD_DURATION*1000){clearInterval(adTimer);closeAd();}
+  },100);
+}
+function closeAd(){clearInterval(adTimer);document.getElementById('adOverlay').classList.remove('open');if(adCallback){adCallback();adCallback=null;}}
+document.getElementById('adSkipBtn').addEventListener('click',()=>{if(adSkipEnabled)closeAd();});
+
+function pickConcept(){
+  const all=CONCEPT_PACKS[selectedMode]||CONCEPT_PACKS.general;
+  let pool=all.map((_,i)=>i).filter(i=>!state.usedConcepts.includes(i));
+  if(!pool.length){state.usedConcepts=[];pool=all.map((_,i)=>i);}
+  const idx=pool[Math.floor(Math.random()*pool.length)];
+  state.usedConcepts.push(idx);return all[idx];
+}
+function newRound(){
+  state.concept=pickConcept();state.targetAngle=15+Math.random()*150;
+  state.needleAngle=90;state.clue='';state.phase='reveal';renderGame();
+}
+
+function renderGame(){
+  const t=state.teams,ct=state.clueTeam,gt=state.guessTeam;
+  document.getElementById('roundBadge').textContent=`TUR ${state.round} / ${state.totalRounds}`;
+  ['sc0','sc1'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    const active=(state.phase==='guess'||state.phase==='result')?gt:ct;
+    el.className='score-card'+(i===active?(i===0?' active':' active-pink'):'');
+    document.getElementById('scName'+i).textContent=t[i].name.toUpperCase();
+    document.getElementById('scScore'+i).textContent=t[i].score;
+  });
+  document.getElementById('conceptLeft').textContent=state.concept[0];
+  document.getElementById('conceptRight').textContent=state.concept[1];
+  const pl=document.getElementById('phaseLabel');
+  if(state.phase==='reveal'){pl.className=ct===0?'':'pink';pl.textContent=`${t[ct].name} hedefi görüyor`;}
+  else if(state.phase==='clue'){pl.className=ct===0?'':'pink';pl.textContent=`${t[ct].name} — İpucu Veriyor`;}
+  else if(state.phase==='guess'){pl.className=gt===0?'':'pink';pl.textContent=`${t[gt].name} — Tahmin Ediyor`;}
+  else{pl.className='';pl.textContent='Sonuç!';}
+  const box=document.getElementById('clueBox'),inp=document.getElementById('clueInput'),lbl=document.getElementById('clueBoxLabel');
+  box.querySelectorAll('.clue-display,.reveal-info').forEach(e=>e.remove());
+  if(state.phase==='reveal'){
+    box.className='clue-box'+(ct===0?'':' pink-mode');box.style.display='flex';
+    lbl.textContent='HEDEFİ GÖR — İPUCU HAZIRLA';inp.style.display='none';
+    const d=document.createElement('div');d.className='reveal-info';
+    d.style.cssText='font-size:13px;color:rgba(226,223,240,.45);line-height:1.65;text-align:center;padding:3px 0;';
+    d.innerHTML=`Parlak bölge <b style="color:var(--accent)">hedef alandır</b>.<br>Diğer takım bakmasın!`;
+    box.appendChild(d);
+  }else if(state.phase==='clue'){
+    box.className='clue-box'+(ct===0?'':' pink-mode');box.style.display='flex';
+    lbl.textContent='İPUCUNU YAZ (1 KELİME)';inp.style.display='block';
+    inp.value=state.clue;inp.disabled=false;setTimeout(()=>inp.focus(),100);
+  }else if(state.phase==='guess'){
+    box.className='clue-box'+(gt===0?'':' pink-mode');box.style.display='flex';
+    lbl.textContent='VERİLEN İPUCU';inp.style.display='none';
+    const d=document.createElement('div');d.className='clue-display';
+    d.textContent=state.clue||'—';d.style.color=gt===0?'var(--accent)':'var(--accent2)';box.appendChild(d);
+  }else{box.style.display='none';}
+  if(state.phase!=='result')document.getElementById('resultBanner').style.display='none';
+  const btn=document.getElementById('btnAction');
+  btn.style.flex='1';
+  if(state.phase==='reveal'){btn.textContent='HAZIR — İPUCU GİR →';btn.className='btn btn-sm'+(ct===0?' btn-primary':' btn-pink');}
+  else if(state.phase==='clue'){btn.textContent='İPUCU KİLİTLE 🔒';btn.className='btn btn-sm'+(ct===0?' btn-primary':' btn-pink');}
+  else if(state.phase==='guess'){btn.textContent='TAHMİN ET ✓';btn.className='btn btn-sm'+(gt===0?' btn-primary':' btn-pink');}
+  else{btn.textContent=state.round>=state.totalRounds?'OYUNU BİTİR 🏁':'SONRAKİ TUR →';btn.className='btn btn-primary btn-sm';}
+  drawDial();
+}
+
+document.getElementById('btnAction').addEventListener('click',handleAction);
+document.getElementById('clueInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleAction();});
+
+function handleAction(){
+  if(state.phase==='reveal'){state.phase='clue';renderGame();}
+  else if(state.phase==='clue'){
+    const v=document.getElementById('clueInput').value.trim();
+    if(!v){const i=document.getElementById('clueInput');i.style.borderColor='rgba(184,122,170,.4)';i.placeholder='Bir kelime yaz!';setTimeout(()=>{i.style.borderColor='';i.placeholder='Kelime ipucu...';},1000);return;}
+    state.clue=v;state.needleAngle=90;state.phase='guess';renderGame();
+  }else if(state.phase==='guess'){
+    state.phase='result';
+    const diff=Math.abs(state.needleAngle-state.targetAngle);
+    let pts=0;
+    if(diff<=4)pts=4;else if(diff<=9)pts=3;else if(diff<=16)pts=2;else if(diff<=24)pts=1;
+    state.teams[state.guessTeam].score+=pts;renderGame();
+    const bn=document.getElementById('resultBanner');bn.style.display='block';
+    bn.textContent={4:'🎯 TAM 12! +4 PUAN',3:'✦ ÇOK YAKIN! +3 PUAN',2:'~ YAKIN! +2 PUAN',1:'△ AZ KALDI! +1 PUAN',0:'✕ ISKALADIN! 0 PUAN'}[pts];
+    bn.className='result-banner res-'+pts;
+    if(pts>=3){playSuccess();launchConfetti();}else if(pts===0)playFail();else playOk();
+    drawDial();
+  }else{
+    if(state.round>=state.totalRounds){showAd(()=>showResult());}
+    else{
+      const doAd=state.round%3===0;
+      state.round++;const tmp=state.clueTeam;state.clueTeam=state.guessTeam;state.guessTeam=tmp;
+      if(doAd)showAd(()=>newRound());else newRound();
+    }
+  }
+}
+
+function showResult(){
+  const sorted=[...state.teams].sort((a,b)=>b.score-a.score);
+  const isDraw=state.teams[0].score===state.teams[1].score;
+  document.getElementById('winnerEmoji').textContent=isDraw?'🤝':'🏆';
+  document.getElementById('winnerName').textContent=isDraw?'BERABERE!':sorted[0].name.toUpperCase();
+  document.getElementById('finalScores').innerHTML=sorted.map((t,i)=>`
+    <div class="fs-row ${i===0&&!isDraw?'winner-row':''}">
+      <span class="fs-name">${t.name}</span>
+      <span class="fs-score" style="color:${i===0&&!isDraw?'var(--accent)':'var(--text3)'}">${t.score}</span>
+    </div>`).join('');
+  show('result-screen');setTimeout(()=>launchConfetti(),200);
+}
+
+/* ── KADRAN ── */
+function drawDial(){
+  const cv=document.getElementById('dialCanvas');
+  const W=cv.offsetWidth||420;
+  const TW=Math.round(W*0.086);
+  const R=W*0.41;
+  const H=R+TW/2+28;
+  cv.width=W;cv.height=Math.round(H);
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H;
+  const isGuess=state.phase==='guess',isResult=state.phase==='result',isReveal=state.phase==='reveal';
+  const showTarget=isReveal||isResult;
+
+  /* Tick marklar */
+  const tickOut=R+TW/2+2;
+  for(let i=0;i<=18;i++){
+    const a=Math.PI+(i/18)*Math.PI,maj=i%3===0,len=maj?11:5;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(a)*tickOut,cy+Math.sin(a)*tickOut);
+    ctx.lineTo(cx+Math.cos(a)*(tickOut+len),cy+Math.sin(a)*(tickOut+len));
+    ctx.strokeStyle=maj?'rgba(200,190,230,.18)':'rgba(200,190,230,.06)';
+    ctx.lineWidth=maj?1.5:1;ctx.stroke();
+  }
+  /* Kavram etiketleri */
+  if(state.concept){
+    const lr=tickOut+18;
+    ctx.font=`bold 11px 'Nunito',sans-serif`;ctx.textBaseline='middle';
+    ctx.fillStyle='#b08878';ctx.textAlign='left';
+    ctx.fillText(state.concept[0],cx+Math.cos(Math.PI)*lr-30,cy+Math.sin(Math.PI)*lr);
+    ctx.fillStyle='#7888aa';ctx.textAlign='right';
+    ctx.fillText(state.concept[1],cx+Math.cos(2*Math.PI)*lr+30,cy+Math.sin(2*Math.PI)*lr);
+  }
+
+  /* Track */
+  ctx.beginPath();ctx.arc(cx,cy,R,Math.PI,2*Math.PI);
+  ctx.strokeStyle='#0a0818';ctx.lineWidth=TW+6;ctx.stroke();
+  /* Baz rengi — yumuşak gradient */
+  const bg=ctx.createLinearGradient(cx-R,0,cx+R,0);
+  bg.addColorStop(0,'rgba(140,80,70,.2)');
+  bg.addColorStop(.5,'rgba(139,126,200,.06)');
+  bg.addColorStop(1,'rgba(70,90,150,.2)');
+  ctx.beginPath();ctx.arc(cx,cy,R,Math.PI,2*Math.PI);
+  ctx.strokeStyle=bg;ctx.lineWidth=TW;ctx.stroke();
+  /* Kenar çizgileri */
+  ctx.beginPath();ctx.arc(cx,cy,R-TW/2,Math.PI,2*Math.PI);ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R+TW/2,Math.PI,2*Math.PI);ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;ctx.stroke();
+
+  /* Hedef bölgeler — yumuşak, neon değil */
+  if(showTarget){
+    const zones=[
+      {spread:54,r:160,g:120,b:60,op:.55},
+      {spread:34,r:155,g:150,b:55,op:.70},
+      {spread:19,r:70,g:140,b:90,op:.82},
+      {spread:8, r:100,g:160,b:110,op:.95},
+    ];
+    zones.forEach(z=>{
+      const a1=Math.PI+(state.targetAngle-z.spread/2)/180*Math.PI;
+      const a2=Math.PI+(state.targetAngle+z.spread/2)/180*Math.PI;
+      ctx.beginPath();ctx.arc(cx,cy,R,a1,a2);
+      ctx.strokeStyle=`rgba(${z.r},${z.g},${z.b},${z.op})`;ctx.lineWidth=TW;ctx.stroke();
+    });
+    /* Bölge ayırıcılar */
+    [27,17,9].forEach(d=>{[-1,1].forEach(side=>{
+      const a=Math.PI+(state.targetAngle+side*d)/180*Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(a)*(R-TW/2),cy+Math.sin(a)*(R-TW/2));
+      ctx.lineTo(cx+Math.cos(a)*(R+TW/2),cy+Math.sin(a)*(R+TW/2));
+      ctx.strokeStyle='rgba(8,6,20,.6)';ctx.lineWidth=2;ctx.stroke();
+    });});
+    /* Merkez çizgi */
+    const ta=Math.PI+state.targetAngle/180*Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(ta)*(R-TW/2-2),cy+Math.sin(ta)*(R-TW/2-2));
+    ctx.lineTo(cx+Math.cos(ta)*(R+TW/2+2),cy+Math.sin(ta)*(R+TW/2+2));
+    ctx.strokeStyle='rgba(240,235,220,.8)';ctx.lineWidth=2;ctx.lineCap='round';ctx.stroke();
+    /* Merkez top */
+    const dx=cx+Math.cos(ta)*R,dy=cy+Math.sin(ta)*R;
+    ctx.beginPath();ctx.arc(dx,dy,6,0,2*Math.PI);
+    ctx.fillStyle='rgba(240,235,220,.7)';ctx.fill();
+  }
+
+  /* ── İBRE — klasik kırmızı, derece yazısı YOK ── */
+  if(isGuess||isResult){
+    const na=Math.PI+state.needleAngle/180*Math.PI;
+    const tip=R+TW/2+4;
+    /* Gölge */
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(na)*tip,cy+Math.sin(na)*tip);
+    ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=7;ctx.lineCap='round';ctx.stroke();
+    /* Gövde — mat kırmızı, gradient */
+    const ng=ctx.createLinearGradient(cx,cy,cx+Math.cos(na)*tip,cy+Math.sin(na)*tip);
+    ng.addColorStop(0,'#8b2020');ng.addColorStop(0.6,'#b03030');ng.addColorStop(1,'#cc4040');
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(na)*tip,cy+Math.sin(na)*tip);
+    ctx.strokeStyle=ng;ctx.lineWidth=4;ctx.lineCap='round';
+    ctx.shadowColor='rgba(160,40,40,.3)';ctx.shadowBlur=isGuess?8:3;ctx.stroke();ctx.shadowBlur=0;
+    /* Uç */
+    const tx=cx+Math.cos(na)*tip,ty=cy+Math.sin(na)*tip;
+    ctx.beginPath();ctx.arc(tx,ty,5,0,2*Math.PI);
+    ctx.fillStyle='#cc4040';ctx.fill();
+    /* Merkez daire — klasik */
+    ctx.beginPath();ctx.arc(cx,cy,11,0,2*Math.PI);ctx.fillStyle='#110e20';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,8,0,2*Math.PI);ctx.fillStyle='#8b2020';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,4,0,2*Math.PI);ctx.fillStyle='#c8a0a0';ctx.fill();
+    /* DERECE YAZISI YOK — kaldırıldı kullanıcı isteğiyle */
+  }else{
+    ctx.beginPath();ctx.arc(cx,cy,8,0,2*Math.PI);ctx.fillStyle='rgba(200,190,230,.07)';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,3,0,2*Math.PI);ctx.fillStyle='rgba(200,190,230,.15)';ctx.fill();
+  }
+}
+
+function setupDialEvents(){
+  const cv=document.getElementById('dialCanvas');
+  cv.removeEventListener('mousedown',onDown);cv.removeEventListener('touchstart',onTouchStart);
+  cv.addEventListener('mousedown',onDown);cv.addEventListener('touchstart',onTouchStart,{passive:false});
+}
+function getAngle(e,cv){
+  const rc=cv.getBoundingClientRect();
+  const x=(e.touches?e.touches[0].clientX:e.clientX)-rc.left-rc.width/2;
+  const y=(e.touches?e.touches[0].clientY:e.clientY)-rc.top-rc.height;
+  let a=Math.atan2(y,x)*180/Math.PI-180;if(a<0)a+=360;return Math.max(0,Math.min(180,a));
+}
+function onDown(e){if(state.phase!=='guess')return;state.dragging=true;state.needleAngle=getAngle(e,e.currentTarget);drawDial();document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);}
+function onMove(e){if(!state.dragging||state.phase!=='guess')return;e.preventDefault();state.needleAngle=getAngle(e,document.getElementById('dialCanvas'));drawDial();}
+function onUp(){state.dragging=false;document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);}
+function onTouchStart(e){if(state.phase!=='guess')return;e.preventDefault();state.needleAngle=getAngle(e,e.currentTarget);drawDial();e.currentTarget.addEventListener('touchmove',onTouchMove,{passive:false});e.currentTarget.addEventListener('touchend',onTouchEnd);}
+function onTouchMove(e){if(state.phase!=='guess')return;e.preventDefault();state.needleAngle=getAngle(e,e.currentTarget);drawDial();}
+function onTouchEnd(e){e.currentTarget.removeEventListener('touchmove',onTouchMove);e.currentTarget.removeEventListener('touchend',onTouchEnd);}
+window.addEventListener('resize',()=>{if(document.getElementById('game').classList.contains('active'))drawDial();});
+
+let AC;
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC;}
+function playSuccess(){const c=ac();[523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;const t=c.currentTime+i*.09;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.15,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.start(t);o.stop(t+.22);});}
+function playOk(){const c=ac();[440,550].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;const t=c.currentTime+i*.1;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.2);});}
+function playFail(){const c=ac();[280,220].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.value=f;const t=c.currentTime+i*.13;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.start(t);o.stop(t+.23);});}
+
+const CONF=['#8b7ec8','#b87aaa','#c8a870','#7888aa','#a09090','#c0b8e0'];
+let confP=[],confR;
+function launchConfetti(){
+  const cv=document.getElementById('confetti');
+  const W=cv.width=window.innerWidth,H=cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');confP=[];
+  for(let i=0;i<130;i++){const a=(Math.random()*360)*Math.PI/180,sp=3+Math.random()*5;
+    confP.push({x:W/2+(Math.random()-.5)*W*.7,y:H*.45,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-5,
+      w:5+Math.random()*6,h:4+Math.random()*5,rot:Math.random()*360,rv:(Math.random()-.5)*6,
+      c:CONF[Math.floor(Math.random()*CONF.length)],life:1});}
+  cancelAnimationFrame(confR);
+  function draw(){ctx.clearRect(0,0,W,H);let alive=false;
+    confP.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.24;p.vx*=.99;p.rot+=p.rv;p.life-=.013;
+      const a=Math.max(0,p.life);if(a>0){alive=true;ctx.save();ctx.globalAlpha=a;ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();}});
+    if(alive)confR=requestAnimationFrame(draw);else ctx.clearRect(0,0,W,H);}
+  draw();
+}
+</script>
+</body>
+</html>
